@@ -1,6 +1,7 @@
 const freshBoard = require('./datasources/board.json');
 
 const games = {};
+const boards = {};
 const tiles = {};
 const teams = {};
 const players = {};
@@ -8,18 +9,21 @@ const players = {};
 const Sides = Object.freeze({ RED: 'RED', BLUE: 'BLUE', YELLOW: 'YELLOW' });
 
 class Board {
-    constructor(board) {
+    constructor(board, game) {
         this.board = board;
+        this.game = game;
         this.tiles = freshBoard.map((tile) => ({
             ...tile,
+            board,
             // Update sides
-            side: Sides.RED,
+            side: Math.random() >= 0.5 ? Sides.RED : Sides.BLUE,
             picked: false,
         }));
     }
 }
 const boardReducer = boardObject => ({
     board: boardObject.board,
+    game: boardObject.game,
     tiles: boardObject.tiles,
 });
 
@@ -43,7 +47,7 @@ class Team {
         this.side = side;
     }
 }
-const teamReducer = teamObject => ({
+const teamReducer = teamObject => teamObject && ({
     team: teamObject.team,
     players: teamObject.players.map(playerReducer),
     master: playerReducer(teamObject.master),
@@ -54,7 +58,7 @@ const teamReducer = teamObject => ({
 class Game {
     constructor(game) {
         this.game = game;
-        this.board = new Board(game);
+        this.board = new Board(game, game);
         // Possibly add team names?
         this.teams = [new Team(`${game}-${Sides.RED}`, Sides.RED), new Team(`${game}-${Sides.BLUE}`, Sides.BLUE)];
         this.turn = Sides.RED;
@@ -66,7 +70,7 @@ const gameReducer = gameObject => ({
     board: boardReducer(gameObject.board),
     teams: gameObject.teams.map(teamReducer),
     turn: gameObject.turn,
-    winner: gameObject.winner,
+    winner: teamReducer(gameObject.winner),
 });
 
 module.exports = {
@@ -74,6 +78,8 @@ module.exports = {
         game: (_, { game }) => {
             if (!(game in games)) {
                 games[game] = new Game(game);
+
+                boards[games[game].board.board] = games[game].board;
 
                 // Adding tiles to Tile cache
                 for (const tile of games[game].board.tiles) {
@@ -84,28 +90,41 @@ module.exports = {
                 for (const team of games[game].teams) {
                     teams[team.team] = team;
                 }
+
+                console.info(`Created game: ${game}`);
             }
-            console.log({ games, tiles });
+            console.info(`Found game: ${game}`);
             return gameReducer(games[game]);
         },
         tile: (_, { tile }) => tiles[tile] || null,
         team: (_, { team }) => teams[team] || null,
+        picked: (_, { board }) => {
+            if (!(board in boards)) {
+                return null;
+            }
+
+            return boards[board].tiles.filter(({ picked }) => picked);
+        }
     },
     Mutation: {
         player: (_, { player, team }) => {
             if (player in players) {
+                console.warn('Player already exists.');
+
                 return {
                     success: false,
                     status: 500,
-                    error: 'Error! Player already exists.'
+                    error: 'Error! Player already exists.',
                 };
             }
 
             if (!(team in teams)) {
+                console.warn('Team does not exist.');
+
                 return {
                     success: false,
                     status: 500,
-                    error: 'Error! Team does not exist.'
+                    error: 'Error! Team does not exist.',
                 };
             }
 
@@ -114,12 +133,82 @@ module.exports = {
                 teams[team].master = players[player]
             }
             teams[team].players.push(players[player]);
-            console.log('Added player', players[player]);
+            console.info(`Added player: ${player}`);
 
             return {
                 success: true,
                 status: 200,
-                error: 'Player successfully created.'
+            };
+        },
+        pick: (_, { tile, player }) => {
+            if (!(tile in tiles)) {
+                console.warn('Tile does not exist.');
+
+                return {
+                    success: false,
+                    status: 500,
+                    error: 'Error! Tile does not exist.',
+                };
+            }
+
+            if (!(player in players)) {
+                console.warn('Player does not exists.');
+
+                return {
+                    success: false,
+                    status: 500,
+                    error: 'Error! Player does not exists.',
+                };
+            }
+
+            if (tiles[tile].picked) {
+                console.warn('Tile is already picked.');
+
+                return {
+                    success: false,
+                    status: 500,
+                    error: 'Error! Tile is already picked.',
+                };
+            }
+
+            const board = boards[tiles[tile].board];
+            const game = games[board.game];
+            const playerTeam = game.teams.find(({ team }) => team === players[player].team);
+
+            if (!playerTeam) {
+                console.warn('Player is not on a team.');
+
+                return {
+                    success: false,
+                    status: 500,
+                    error: 'Error! Player is not on a team.',
+                };
+            }
+
+            if (playerTeam.side !== game.turn) {
+                console.warn('It\'s not your turn.');
+
+                return {
+                    success: false,
+                    status: 500,
+                    error: 'Error! It\'s not your turn.',
+                };
+            }
+
+            // Maybe add the code below in a try and catch and return a 500?
+            tiles[tile].picked = true;
+            console.info(`Picked tile: ${tile}`);
+            
+            // Break up into functions
+            const team = game.teams.find(({ side }) => side === tiles[tile].side);
+            team.score += 1;
+            console.info(`Team ${team.team} won a point and a score of ${team.score}.`);
+            game.turn = game.turn === Sides.RED ? Sides.BLUE : Sides.RED;
+            console.info(`${game.turn}'s turn.`);
+
+            return {
+                success: true,
+                status: 200,
             };
         },
     },

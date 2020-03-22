@@ -4,33 +4,34 @@ import ApolloClient from 'apollo-boost';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { GRAPHQL_URI } from './constants';
-import logo from './logo.svg';
 import './App.css';
-import Board from './components/Board';
-import PlayerForm from './components/PlayerForm';
+import LoginView from './views/LoginView';
+import { GameContextProvider } from './context/gameContext';
+import AppContainer from './styled-components/AppContainer';
+import GameBoardView from './views/GameBoardView';
 
 const client = new ApolloClient({
   uri: GRAPHQL_URI,
 });
 
 const App = () => (
-  <ApolloProvider client={client}>
-    <CssBaseline />
-    <Router>
-        <Switch>
-          <Route exact path="/">
-            <div className="App">
-              <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <p>Codenames</p>
-              </header>
-              <PlayerForm />
-              <Board />
-            </div>
-          </Route>
-      </Switch>
-    </Router>
-  </ApolloProvider>
+  <GameContextProvider>
+    <ApolloProvider client={client}>
+      <CssBaseline />
+      <AppContainer>
+        <Router>
+            <Switch>
+            <Route exact path="/">
+                <LoginView />
+              </Route>
+              <Route path="/:game/:player">
+                <GameBoardView />
+              </Route>
+          </Switch>
+        </Router>
+      </AppContainer>
+    </ApolloProvider>
+  </GameContextProvider>
 );
 
 export default App;

@@ -11,10 +11,11 @@ const typeDefs = gql`
         # board(board: ID!): Board
         tile(tile: ID!): Tile
         team(team: ID!): Team
+        picked(board: ID!): [Tile]
     }
     type Mutation {
         player(player: ID!, team: ID!): PlayerResponse!
-        # pick(tile: ID!, player: ID!): PickedResponse!
+        pick(tile: ID!, player: ID!): PickResponse!
     }
     type Game {
         game: ID!
@@ -25,6 +26,7 @@ const typeDefs = gql`
     }
     type Board {
         board: ID!
+        game: ID!
         tiles: [Tile]!
     }
     type Team {
@@ -36,6 +38,7 @@ const typeDefs = gql`
     }
     type Tile {
         tile: ID!
+        board: ID!
         word: String!
         side: Side!
         picked: Boolean!
@@ -49,7 +52,7 @@ const typeDefs = gql`
         status: String
         error: String
     }
-    type PickedResponse {
+    type PickResponse {
         success: Boolean!
         status: String
         error: String

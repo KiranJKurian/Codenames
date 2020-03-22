@@ -10,8 +10,6 @@ export const GET_GAME = gql`
         tiles {
           tile
           word
-          side
-          picked
         }
       }
       teams {
