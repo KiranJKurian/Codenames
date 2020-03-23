@@ -69,7 +69,7 @@ const GameBoard = ({ game, player }) => {
   const handleTileClick = tile => () => {
     console.log(`Selected ${tile}`);
     pickTile({
-      variables: { tile, player },
+      variables: { tile, player, game },
     });
   };
 

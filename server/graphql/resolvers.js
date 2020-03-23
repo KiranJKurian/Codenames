@@ -30,12 +30,12 @@ const boardReducer = boardObject => ({
 class Player {
     constructor(player, team = null) {
         this.player = player;
-        this.team = team;
+        this.teams = team ? [team] : [];
     }
 }
 const playerReducer = playerObject => playerObject && {
     player: playerObject.player,
-    team: playerObject.team,
+    teams: playerObject.teams,
 };
 
 class Team {
@@ -93,7 +93,6 @@ module.exports = {
 
                 console.info(`Created game: ${game}`);
             }
-            console.info(`Found game: ${game}`);
             return gameReducer(games[game]);
         },
         tile: (_, { tile }) => tiles[tile] || null,
@@ -107,63 +106,121 @@ module.exports = {
         }
     },
     Mutation: {
-        player: (_, { player, team }) => {
-            if (player in players) {
-                console.warn('Player already exists.');
+        player: (_, {
+            player: playerId,
+            team: teamId,
+            game: gameId,
+        }) => {
+            let player = players[playerId];
+            const team = teams[teamId];
+            const game = games[gameId];
 
+            if (!game) {
+                console.warn(`Game ${gameId} does not exist.`);
                 return {
                     success: false,
                     status: 500,
-                    error: 'Error! Player already exists.',
+                    error: 'Error! Game does not exist.',
                 };
             }
-
-            if (!(team in teams)) {
-                console.warn('Team does not exist.');
-
+            if (!team) {
+                console.warn(`Team ${teamId} does not exist.`);
                 return {
                     success: false,
                     status: 500,
                     error: 'Error! Team does not exist.',
                 };
             }
-
-            players[player] = new Player(player, team);
-            if (teams[team].players.length === 0) {
-                teams[team].master = players[player]
+            if (!game.teams.some(({ team: teamName }) => teamName === teamId)) {
+                console.warn(`Team ${teamId} does not exist in game ${gameId}.`);
+                return {
+                    success: false,
+                    status: 500,
+                    error: 'Error! Team does not exist in game.',
+                };
             }
-            teams[team].players.push(players[player]);
-            console.info(`Added player: ${player}`);
+
+            if (!player) {
+                player = new Player(playerId, teamId);
+                players[playerId] = player;
+            } else if (!player.teams.includes(teamId)) {
+                // If player is on a different team in this game, switch them
+                const teamToSwitch = game.teams
+                    .find(({ players }) => 
+                        players.some(({ player: playerName }) => playerName === playerId
+                    ));
+
+                if (teamToSwitch) {
+                    console.info(`Player ${playerId} leaving team ${teamToSwitch.team}.`);
+                    // Remove old team from player's teams
+                    const playerTeamIndex = player.teams.findIndex(({ team: playerTeam }) => playerTeam === teamToSwitch.team);
+                    player.teams.splice(playerTeamIndex, 1);
+                    // Remove player from old team's players
+                    const teamToSwitchIndex = teamToSwitch.players.findIndex(({ team: switchTeam }) => switchTeam === playerId);
+                    teamToSwitch.players.splice(teamToSwitchIndex, 1);
+                    // If old team is now empty, set master to null
+                    if (teamToSwitch.players.length === 0) {
+                        teamToSwitch.master = null;
+                    }
+                }
+
+                // Add team to player's teams
+                player.teams.push(teamId);
+            } else {
+                // Player is already on the team
+                console.info(`Player: ${playerId} is already on team: ${teamId}.`);
+                return {
+                    success: true,
+                    status: 200,
+                };
+            }
+
+            if (team.players.length === 0) {
+                team.master = player;
+            }
+            team.players.push(player);
+            console.info(`Added player: ${playerId} to team ${teamId}.`);
 
             return {
                 success: true,
                 status: 200,
             };
         },
-        pick: (_, { tile, player }) => {
-            if (!(tile in tiles)) {
-                console.warn('Tile does not exist.');
+        pick: (_, {
+            tile: tileId,
+            player: playerId,
+            game: gameId,
+        }) => {
+            const tile = tiles[tileId];
+            const player = players[playerId];
+            const game = games[gameId];
 
+            if (!game) {
+                console.warn(`Game ${gameId} does not exist.`);
+                return {
+                    success: false,
+                    status: 500,
+                    error: 'Error! Game does not exist.',
+                };
+            }
+            if (!tile) {
+                console.warn(`Tile ${tileId} does not exist.`);
                 return {
                     success: false,
                     status: 500,
                     error: 'Error! Tile does not exist.',
                 };
             }
-
-            if (!(player in players)) {
-                console.warn('Player does not exists.');
-
+            if (!player) {
+                console.warn(`Player ${playerId} does not exists.`);
                 return {
                     success: false,
                     status: 500,
                     error: 'Error! Player does not exists.',
                 };
             }
-
-            if (tiles[tile].picked) {
-                console.warn('Tile is already picked.');
-
+            if (tile.picked) {
+                console.warn(`Tile ${tileId} is already picked.`);
                 return {
                     success: false,
                     status: 500,
@@ -171,23 +228,18 @@ module.exports = {
                 };
             }
 
-            const board = boards[tiles[tile].board];
-            const game = games[board.game];
-            const playerTeam = game.teams.find(({ team }) => team === players[player].team);
+            const playerTeam = game.teams.find(({ team }) => player.teams.includes(team));
 
             if (!playerTeam) {
-                console.warn('Player is not on a team.');
-
+                console.warn(`Player ${playerId} is not on a team.`);
                 return {
                     success: false,
                     status: 500,
                     error: 'Error! Player is not on a team.',
                 };
             }
-
             if (playerTeam.side !== game.turn) {
-                console.warn('It\'s not your turn.');
-
+                console.warn(`It's not your turn ${playerId}.`);
                 return {
                     success: false,
                     status: 500,
@@ -196,11 +248,11 @@ module.exports = {
             }
 
             // Maybe add the code below in a try and catch and return a 500?
-            tiles[tile].picked = true;
-            console.info(`Picked tile: ${tile}`);
+            tile.picked = true;
+            console.info(`Picked tile: ${tileId}`);
             
             // Break up into functions
-            const team = game.teams.find(({ side }) => side === tiles[tile].side);
+            const team = game.teams.find(({ side }) => side === tile.side);
             team.score += 1;
             console.info(`Team ${team.team} won a point and a score of ${team.score}.`);
             game.turn = game.turn === Sides.RED ? Sides.BLUE : Sides.RED;

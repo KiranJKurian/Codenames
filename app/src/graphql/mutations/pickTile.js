@@ -3,10 +3,15 @@ import { useMutation } from '@apollo/react-hooks';
 import { GET_SCORE_AND_PICKED } from '../queries/getScoreAndPicked';
 
 export const PICK_TILE = gql`
-  mutation pickTile($tile: ID! $player: ID!) {
+  mutation pickTile(
+    $tile: ID!
+    $player: ID!
+    $game: ID!
+  ) {
     pick(
       tile: $tile
       player: $player
+      game: $game
     ) {
       success
       status

@@ -28,7 +28,11 @@ const GameForm = () => {
     onCompleted: () => {
       const gameTeam = `${game}-${team}`;
       createPlayer({
-        variables: { player, team: gameTeam },
+        variables: {
+          player,
+          team: gameTeam,
+          game,
+        },
       });
       setTeam(gameTeam);
       push(`${game}/${player}`);
