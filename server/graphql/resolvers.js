@@ -14,6 +14,7 @@ class Board {
         this.game = game;
         this.tiles = freshBoard.map((tile) => ({
             ...tile,
+            tile: `${tile.tile}-${Math.random()}`,
             board,
             // Update sides
             side: Math.random() >= 0.5 ? Sides.RED : Sides.BLUE,
@@ -75,6 +76,18 @@ const gameReducer = gameObject => ({
 
 module.exports = {
     Query: {
+        game: (_, { game }) => game in games ? gameReducer(games[game]) : null,
+        tile: (_, { tile }) => tiles[tile] || null,
+        team: (_, { team }) => teams[team] || null,
+        picked: (_, { board }) => {
+            if (!(board in boards)) {
+                return null;
+            }
+
+            return boards[board].tiles.filter(({ picked }) => picked);
+        }
+    },
+    Mutation: {
         game: (_, { game }) => {
             if (!(game in games)) {
                 games[game] = new Game(game);
@@ -93,19 +106,12 @@ module.exports = {
 
                 console.info(`Created game: ${game}`);
             }
-            return gameReducer(games[game]);
+            
+            return {
+                success: true,
+                status: 200,
+            };
         },
-        tile: (_, { tile }) => tiles[tile] || null,
-        team: (_, { team }) => teams[team] || null,
-        picked: (_, { board }) => {
-            if (!(board in boards)) {
-                return null;
-            }
-
-            return boards[board].tiles.filter(({ picked }) => picked);
-        }
-    },
-    Mutation: {
         player: (_, {
             player: playerId,
             team: teamId,
@@ -145,22 +151,28 @@ module.exports = {
                 players[playerId] = player;
             } else if (!player.teams.includes(teamId)) {
                 // If player is on a different team in this game, switch them
-                const teamToSwitch = game.teams
+                const { team: teamToSwitchId } = game.teams
                     .find(({ players }) => 
                         players.some(({ player: playerName }) => playerName === playerId
-                    ));
+                    )) || {};
+                const teamToSwitch = teams[teamToSwitchId];
 
                 if (teamToSwitch) {
-                    console.info(`Player ${playerId} leaving team ${teamToSwitch.team}.`);
+                    console.info(`Player ${playerId} leaving team ${teamToSwitchId}.`);
                     // Remove old team from player's teams
-                    const playerTeamIndex = player.teams.findIndex(({ team: playerTeam }) => playerTeam === teamToSwitch.team);
+                    const playerTeamIndex = player.teams.findIndex(({ team: playerTeam }) => playerTeam === teamToSwitchId);
                     player.teams.splice(playerTeamIndex, 1);
                     // Remove player from old team's players
-                    const teamToSwitchIndex = teamToSwitch.players.findIndex(({ team: switchTeam }) => switchTeam === playerId);
-                    teamToSwitch.players.splice(teamToSwitchIndex, 1);
+                    const playerToDeleteIndex = teamToSwitch.players.findIndex(({ player: playerToDelete }) => playerToDelete === playerId);
+                    teamToSwitch.players.splice(playerToDeleteIndex, 1);
                     // If old team is now empty, set master to null
                     if (teamToSwitch.players.length === 0) {
                         teamToSwitch.master = null;
+                        console.info(`Team ${teamToSwitchId} is now empty.`);
+                    } else if (teamToSwitch.master.player === playerId) {
+                        // Old team is not empty but player was master, assign new master
+                        teamToSwitch.master = teamToSwitch.players[0];
+                        console.info(`Player ${teamToSwitch.players[0].player} promoted to master of team ${teamToSwitchId}.`);
                     }
                 }
 

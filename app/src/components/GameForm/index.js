@@ -1,14 +1,13 @@
 import React, { useState, useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { FormControl, MenuItem } from '@material-ui/core';
-import { useLazyQuery } from '@apollo/react-hooks';
 import CenteredContainer from '../../styled-components/CenteredContainer';
 import StretchedTextField from '../../styled-components/StretchedTextField';
 import StretchedButton from '../../styled-components/StretchedButton';
 import StretchedSelect from '../../styled-components/StretchedSelect';
 import { GameContext } from '../../context/gameContext';
 import { useCreatePlayer } from '../../graphql/mutations/createPlayer';
-import { GET_GAME } from '../../graphql/queries/getGame';
+import { useCreateGame } from '../../graphql/mutations/createGame';
 
 const GameForm = () => {
   const { push } = useHistory();
@@ -24,7 +23,7 @@ const GameForm = () => {
 
   const [createPlayer] = useCreatePlayer();
 
-  const [getGame] = useLazyQuery(GET_GAME, {
+  const [createGame] = useCreateGame({
     onCompleted: () => {
       const gameTeam = `${game}-${team}`;
       createPlayer({
@@ -44,7 +43,7 @@ const GameForm = () => {
       autoComplete="off"
       onSubmit={e => {
         e.preventDefault();
-        getGame({ variables: { game }});
+        createGame({ variables: { game }});
       }}
     >
       <CenteredContainer maxWidth="sm">

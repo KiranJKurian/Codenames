@@ -7,15 +7,16 @@ const typeDefs = gql`
         YELLOW
     }
     type Query {
-        game(game: ID!): Game!
+        game(game: ID!): Game
         # board(board: ID!): Board
         tile(tile: ID!): Tile
         team(team: ID!): Team
         picked(board: ID!): [Tile]
     }
     type Mutation {
-        player(player: ID! team: ID! game: ID!): PlayerResponse!
-        pick(tile: ID! player: ID! game: ID!): PickResponse!
+        game(game: ID!): MutationResponse!
+        player(player: ID! team: ID! game: ID!): MutationResponse!
+        pick(tile: ID! player: ID! game: ID!): MutationResponse!
     }
     type Game {
         game: ID!
@@ -47,12 +48,7 @@ const typeDefs = gql`
         player: ID!
         teams: [ID]
     }
-    type PlayerResponse {
-        success: Boolean!
-        status: String
-        error: String
-    }
-    type PickResponse {
+    type MutationResponse {
         success: Boolean!
         status: String
         error: String

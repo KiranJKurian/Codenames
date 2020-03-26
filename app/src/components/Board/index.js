@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Board = ({ codenames, onTileClick, player }) => {
+const Board = ({ codenames, onTileClick, player, isMaster }) => {
   const classes = useStyles();
 
   return (
@@ -27,7 +27,7 @@ const Board = ({ codenames, onTileClick, player }) => {
               color={side ? side === 'BLUE' ? 'primary' : 'secondary' : undefined}
               className={classes.button}
               disabled={!player}
-              onClick={onTileClick(tile)}
+              onClick={isMaster ? () => {} : onTileClick(tile)}
             >
               {word}
             </Button>

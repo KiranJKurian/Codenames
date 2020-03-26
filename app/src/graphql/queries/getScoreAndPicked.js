@@ -19,8 +19,9 @@ export const GET_SCORE_AND_PICKED = gql`
   }
 `;
 
-export const useScoreAndPicked = (board, game) =>
+export const useScoreAndPicked = (board, game, config) =>
   useQuery(GET_SCORE_AND_PICKED, {
     variables: { board, game },
     pollInterval: 3000,
+    ...config,
   });
