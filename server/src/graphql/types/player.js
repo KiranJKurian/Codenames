@@ -7,6 +7,7 @@ const typeDef = `
     promotePlayer(name: String! roomCode: String!): PlayerMutationResponse
     demotePlayer(name: String! roomCode: String!): PlayerMutationResponse
     switchTeam(name: String! roomCode: String!): PlayerMutationResponse
+    removePlayer(name: String! roomCode: String!): RemovePlayerMutationResponse
   }
 
   type PlayerMutationResponse implements MutationResponse {
@@ -14,6 +15,12 @@ const typeDef = `
     success: Boolean!
     message: String!
     player: Player
+  }
+
+  type RemovePlayerMutationResponse implements MutationResponse {
+    code: String!
+    success: Boolean!
+    message: String!
   }
 
   type Player {
@@ -155,6 +162,36 @@ const resolvers = {
           code: '500',
           success: false,
           message: e.toString(),
+        };
+      }
+    },
+
+    removePlayer: async (_, { name, roomCode }) => {
+      try {
+        const player = await Room.findOneAndUpdate(
+          { roomCode },
+          { $pull: { players: { name } } },
+          { useFindAndModify: false }
+        ).catch(e => {
+          console.log(e);
+          return null;
+        });
+
+        if (player === null) {
+          throw new Error();
+        }
+
+        return {
+          code: '200',
+          success: true,
+          message: 'Removed player',
+        };
+      } catch (e) {
+        console.error(e);
+        return {
+          code: '500',
+          success: false,
+          message: `Could not remove player ${name} of room ${roomCode}`,
         };
       }
     },
