@@ -37,4 +37,5 @@ export const GET_GAME = gql`
 export const useGame = (game, isMaster = false) =>
   useQuery(GET_GAME, {
     variables: { game, isMaster },
+    pollInterval: 3000,
   });
