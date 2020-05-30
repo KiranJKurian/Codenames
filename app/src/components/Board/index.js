@@ -24,6 +24,7 @@ const Board = ({ codenames, onTileClick, player, isMaster }) => {
           <Paper>
             <Button
               variant={picked ? 'contained' : 'outlined'}
+              // eslint-disable-next-line no-nested-ternary
               color={side ? side === 'BLUE' ? 'primary' : 'secondary' : undefined}
               className={classes.button}
               disabled={!player}

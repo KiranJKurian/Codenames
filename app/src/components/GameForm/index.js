@@ -49,14 +49,14 @@ const GameForm = () => {
       <CenteredContainer maxWidth="sm">
         <StretchedTextField
           onChange={({ target: { value } }) => setGame(value)}
-          value={game}
+          value={game || ''}
           id="game-field"
           label="Game code"
           required
         />
         <StretchedTextField
           onChange={({ target: { value } }) => setPlayer(value)}
-          value={player}
+          value={player || ''}
           id="player-field"
           label="Player name"
           required
