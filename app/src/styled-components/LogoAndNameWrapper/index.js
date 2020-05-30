@@ -1,7 +1,7 @@
-import { styled } from '@material-ui/core';
+import styled from "styled-components";
 
-export default styled('div')({
-  alignItems: 'center',
-  display: 'inline-flex',
-  flexGrow: 1,
-});
+export default styled.div`
+  align-items: center;
+  display: inline-flex;
+  flex-grow: 1;
+`;

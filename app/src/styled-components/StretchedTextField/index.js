@@ -1,7 +1,7 @@
 import { TextField } from '@material-ui/core';
-import { styled } from '@material-ui/core/styles';
+import styled from 'styled-components';
 
-export default styled(TextField)(({ theme }) => ({
-  marginBottom: theme.spacing(4),
-  width: '100%',
-}));
+export default styled(TextField)`
+  margin-bottom: 32px;
+  width: 100%;
+`;

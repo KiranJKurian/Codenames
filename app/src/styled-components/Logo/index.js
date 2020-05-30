@@ -1,5 +1,5 @@
-import { styled } from '@material-ui/core';
+import styled from "styled-components";
 
-export default styled('img')({
-  height: '40px',
-});
+export default styled.img`
+  height: 40px;
+`;

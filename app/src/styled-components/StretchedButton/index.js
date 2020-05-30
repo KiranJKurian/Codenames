@@ -1,6 +1,6 @@
 import { Button } from '@material-ui/core';
-import { styled } from '@material-ui/core/styles';
+import styled from 'styled-components';
 
-export default styled(Button)({
-  width: '100%',
-});
+export default styled(Button)`
+  width: 100%;
+`;

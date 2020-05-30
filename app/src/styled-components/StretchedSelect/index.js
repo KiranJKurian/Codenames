@@ -1,7 +1,7 @@
 import { Select } from '@material-ui/core';
-import { styled } from '@material-ui/core/styles';
+import styled from 'styled-components';
 
-export default styled(Select)(({ theme }) => ({
-  marginBottom: theme.spacing(4),
-  width: '100%',
-}));
+export default styled(Select)`
+  margin-bottom: 32px;
+  width: 100%;
+`;
