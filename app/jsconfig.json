@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "#sc/*": [
+                "./src/styled/styled-components/*"
+            ],
+            "#views/*": [
+                "./src/views/*"
+            ],
+            "#components/*": [
+                "./src/components/*"
+            ],
+            "#constants": [
+                "./src/constants"
+            ],
+            "#context/*": [
+                "./src/context/*"
+            ],
+            "#graphql/*": [
+                "./src/graphql/*"
+            ]
+        }
+    }
+}

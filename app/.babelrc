@@ -3,6 +3,34 @@
         "react-app"
     ],
     "plugins": [
-        "babel-plugin-styled-components"
+        "babel-plugin-styled-components",
+        [
+            "module-resolver",
+            {
+                "root": [
+                    "."
+                ],
+                "alias": {
+                    "#sc": [
+                        "./src/styled/styled-components"
+                    ],
+                    "#views": [
+                        "./src/views"
+                    ],
+                    "#components": [
+                        "./src/components"
+                    ],
+                    "#constants": [
+                        "./src/constants"
+                    ],
+                    "#context": [
+                        "./src/context"
+                    ],
+                    "#graphql": [
+                        "./src/graphql"
+                    ]
+                }
+            }
+        ]
     ]
 }

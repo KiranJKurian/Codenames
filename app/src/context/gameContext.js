@@ -15,7 +15,7 @@ export const GameContext = React.createContext({
 export const GameContextProvider = ({ children }) => {
   const [player, setPlayer] = useState(null);
   const [team, setTeam] = useState(null);
-  const [game, setGame] = useState(`test-${Math.random()}`);
+  const [game, setGame] = useState(null);
   const [board, setBoard] = useState(null);
 
   return (

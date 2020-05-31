@@ -7,7 +7,7 @@ import { GRAPHQL_URI } from './constants';
 import './App.css';
 import LoginView from './views/LoginView';
 import { GameContextProvider } from './context/gameContext';
-import AppContainer from './styled-components/AppContainer';
+import AppContainer from './styled/styled-components/AppContainer';
 import GameBoardView from './views/GameBoardView';
 
 const client = new ApolloClient({

@@ -9,9 +9,9 @@ import {
 } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { useHistory } from 'react-router-dom';
+import Logo from '#sc/Logo';
+import LogoAndNameWrapper from '#sc/LogoAndNameWrapper';
 import logo from '../../logo.svg';
-import Logo from '../../styled-components/Logo';
-import LogoAndNameWrapper from '../../styled-components/LogoAndNameWrapper';
 
 const AppBarWithLogout = () => {
   const { push } = useHistory();

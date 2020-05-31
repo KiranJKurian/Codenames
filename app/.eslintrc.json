@@ -6,7 +6,8 @@
     "prettier/react"
   ],
   "plugins": [
-    "prettier"
+    "prettier",
+    "import"
   ],
   "rules": {
     "comma-dangle": [
@@ -32,6 +33,16 @@
     "import/prefer-default-export": 0,
     "semi": "error"
   },
+  "overrides": [
+    {
+      "files": [
+        "**/*.js"
+      ],
+      "rules": {
+        "no-unused-vars": "warn"
+      }
+    }
+  ],
   "globals": {
     "window": true,
     "document": true,
@@ -43,6 +54,32 @@
     "Headers": true,
     "Request": true,
     "fetch": true
+  },
+  "settings": {
+    "import/resolver": {
+      "babel-module": {
+        "alias": {
+          "#sc": [
+            "./src/styled/styled-components"
+          ],
+          "#views": [
+            "./src/views"
+          ],
+          "#components": [
+            "./src/components"
+          ],
+          "#constants": [
+            "./src/constants"
+          ],
+          "#context": [
+            "./src/context"
+          ],
+          "#graphql": [
+            "./src/graphql"
+          ]
+        }
+      }
+    }
   },
   "parser": "babel-eslint"
 }

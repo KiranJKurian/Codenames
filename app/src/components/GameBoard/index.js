@@ -1,11 +1,11 @@
 import React, { useEffect, useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Grid } from '@material-ui/core';
+import { useGame } from '#graphql/queries/getGame';
+import { useScoreAndPicked } from '#graphql/queries/getScoreAndPicked';
+import { usePickTile } from '#graphql/mutations/pickTile';
+import { GameContext } from '#context/gameContext';
 import Board from '../Board';
-import { useGame } from '../../graphql/queries/getGame';
-import { useScoreAndPicked } from '../../graphql/queries/getScoreAndPicked';
-import { usePickTile } from '../../graphql/mutations/pickTile';
-import { GameContext } from '../../context/gameContext';
 
 const isPlayerMaster = (teams = [], player = null) => teams.some(({
   master,
