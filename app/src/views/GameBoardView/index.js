@@ -5,14 +5,14 @@ import AppBarWithLogout from '#components/AppBarWithLogout';
 import GameBoard from '#components/GameBoard';
 
 const GameBoardView = () => {
-  const { game, player } = useParams();
+  const { roomCode } = useParams();
 
   return (
     <>
       <AppBarWithLogout />
       <Container>
         <Box my={10}>
-          <GameBoard game={game} player={player} />
+          <GameBoard roomCode={roomCode} />
         </Box>
       </Container>
     </>

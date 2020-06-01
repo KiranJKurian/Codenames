@@ -5,6 +5,9 @@
             "#sc/*": [
                 "./src/styled/styled-components/*"
             ],
+            "#styles/*": [
+                "./src/styled/styles/*"
+            ],
             "#views/*": [
                 "./src/views/*"
             ],

@@ -5,13 +5,14 @@ import { useGame } from '#graphql/queries/getGame';
 import { useScoreAndPicked } from '#graphql/queries/getScoreAndPicked';
 import { usePickTile } from '#graphql/mutations/pickTile';
 import { GameContext } from '#context/gameContext';
+import { useRoom } from '#graphql/queries/getRoom';
 import Board from '../Board';
 
 const isPlayerMaster = (teams = [], player = null) => teams.some(({
   master,
 }) => master && master.player === player);
 
-const GameBoard = ({ game, player }) => {
+const GameBoard = ({ roomCode }) => {
   const { setBoard } = useContext(GameContext);
   const [isMaster, setIsMaster] = useState(false);
 
@@ -19,46 +20,72 @@ const GameBoard = ({ game, player }) => {
     loading: loadingTiles,
     error: errorTiles,
     data: {
-      game: {
-        board: {
-          board,
-          tiles = [],
-        } = {},
-        teams = [],
-      } = {},
+      room,
     } = {},
-  } = useGame(game, isMaster);
+  } = useRoom(roomCode);
 
-  useEffect(() => {
-    setBoard(board);
-  }, [board, setBoard]);
+  const {
+    currentGame: {
+      id,
+      turn,
+      winner,
+      board: tiles = [],
+      // board {
+      //   id
+      //   word
+      //   side
+      //   picked
+      // }
+      remainingRed,
+      remainingBlue,
+    } = {},
+  } = room || {};
 
-  useEffect(() => {
-    setIsMaster(isPlayerMaster(teams, player));
-  }, [teams, player, setIsMaster]);
+  // const {
+  //   loading: loadingTiles,
+  //   error: errorTiles,
+  //   data: {
+  //     game: {
+  //       board: {
+  //         board,
+  //         tiles = [],
+  //       } = {},
+  //       teams = [],
+  //     } = {},
+  //   } = {},
+  // } = useGame(game, isMaster);
+
+  // useEffect(() => {
+  //   setBoard(board);
+  // }, [board, setBoard]);
+
+  // useEffect(() => {
+  //   setIsMaster(isPlayerMaster(teams, player));
+  // }, [teams, player, setIsMaster]);
 
   // TODO: Might be better to check master and picked here since it polls and master won't be stale from above
-  const {
-    loading: loadingPicked,
-    error: errorPicked,
-    data: {
-      picked: pickedTiles = [],
-      // game: {
-      //   teams: {
-      //     team,
-      //     score,
-      //   } = {},
-      // } = {},
-    } = {},
-  } = useScoreAndPicked(board, game, { skip: board === undefined });
+  // const {
+  //   loading: loadingPicked,
+  //   error: errorPicked,
+  //   data: {
+  //     picked: pickedTiles = [],
+  //     // game: {
+  //     //   teams: {
+  //     //     team,
+  //     //     score,
+  //     //   } = {},
+  //     // } = {},
+  //   } = {},
+  // } = useScoreAndPicked(board, game, { skip: board === undefined });
 
-  const [pickTile] = usePickTile(board, game);
+  // const [pickTile] = usePickTile(board, game);
+  const pickedTiles = tiles.filter(({ picked }) => picked);
 
-  if (errorTiles || errorPicked) {
+  if (errorTiles) {
     return <div>Oops, looks like we got an error. Please try again later</div>;
   }
 
-  if (loadingTiles || loadingPicked) {
+  if (loadingTiles) {
     return <div>Loading...</div>;
   }
 
@@ -79,9 +106,9 @@ const GameBoard = ({ game, player }) => {
 
   const handleTileClick = tile => () => {
     console.log(`Selected ${tile}`);
-    pickTile({
-      variables: { tile, player, game },
-    });
+    // pickTile({
+    //   variables: { tile, player, game },
+    // });
   };
 
   return (
@@ -92,7 +119,7 @@ const GameBoard = ({ game, player }) => {
             <Board
               onTileClick={handleTileClick}
               codenames={codenames}
-              player={player}
+              // player={player}
               isMaster={isMaster}
             />
           </Grid>
@@ -103,13 +130,11 @@ const GameBoard = ({ game, player }) => {
 };
 
 GameBoard.propTypes = {
-  game: PropTypes.string,
-  player: PropTypes.string,
+  roomCode: PropTypes.string,
 };
 
 GameBoard.defaultProps = {
-  game: null,
-  player: null,
+  roomCode: null,
 };
 
 export default GameBoard;

@@ -4,6 +4,7 @@
     ],
     "plugins": [
         "babel-plugin-styled-components",
+        "@babel/plugin-proposal-optional-chaining",
         [
             "module-resolver",
             {
@@ -13,6 +14,9 @@
                 "alias": {
                     "#sc": [
                         "./src/styled/styled-components"
+                    ],
+                    "#styles": [
+                        "./src/styled/styles"
                     ],
                     "#views": [
                         "./src/views"

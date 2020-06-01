@@ -1,11 +1,10 @@
 import React from 'react';
-import { Card, CardContent, Container, Fab } from '@material-ui/core';
-import AddIcon from '@material-ui/icons/Add';
+import { Container } from '@material-ui/core';
 import styled from 'styled-components';
-import JoinGameForm from '#components/JoinGameForm';
+import JoinGame from '#components/JoinGame';
 import LargeLogo from '#sc/LargeLogo';
-import CardHeaderWithBorderBottom from '#sc/CardHeaderWithBorderBottom';
 import FadeIn from '#sc/FadeIn';
+import CreateNewGame from '#components/CreateNewGame';
 import logo from '../../logo.svg';
 
 const NewGameContainer = styled.div`
@@ -14,25 +13,19 @@ const NewGameContainer = styled.div`
   margin-top: 16px;
 `;
 
-const AddIconWithMargin = styled(AddIcon)`
-  margin-right: 8px;
+const JoinGameContainer = styled.div`
+  margin-top: 64px;
 `;
 
 const LoginView = () => (
   <FadeIn>
     <Container maxWidth="sm">
       <LargeLogo src={logo} alt="logo" />
-      <Card>
-        <CardHeaderWithBorderBottom title="Join Game" />
-        <CardContent>
-          <JoinGameForm />
-        </CardContent>
-      </Card>
+      <JoinGameContainer>
+        <JoinGame />
+      </JoinGameContainer>
       <NewGameContainer>
-        <Fab size="large" color="secondary" variant="extended" aria-labelledBy="createNewGame">
-          <AddIconWithMargin />
-          <span id="createNewGame">New Game</span>
-        </Fab>
+        <CreateNewGame />
       </NewGameContainer>
     </Container>
   </FadeIn>
