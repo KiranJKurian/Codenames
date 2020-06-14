@@ -12,6 +12,7 @@ const { typeDef: Room, resolvers: roomResolvers } = require('./graphql/types/roo
 const { typeDef: Game, resolvers: gameResolvers } = require('./graphql/types/game');
 const { typeDef: Player, resolvers: playerResolvers } = require('./graphql/types/player');
 const { typeDef: Tile, resolvers: tileResolvers } = require('./graphql/types/tile');
+const { Room: mongooseRoom } = require('./mongoose/types/Room');
 
 db.once('open', () => {
   // we're connected!
@@ -27,6 +28,26 @@ db.once('open', () => {
       playerResolvers,
       tileResolvers
     ),
+    context: async ({ req: { body: { variables: { name, roomCode } = {} } = {} } = {} }) => {
+      if (!roomCode || !name) {
+        return {};
+      }
+      try {
+        return await mongooseRoom
+          .findOne({ roomCode }, { games: { $slice: -1 }, players: { $elemMatch: { name } } })
+          .then(room => {
+            const {
+              players: [player],
+              games: [currentGame],
+            } = room;
+
+            return { player, currentGame };
+          })
+          .catch(() => ({}));
+      } catch (e) {
+        return {};
+      }
+    },
   });
 
   server.listen(4000).then(({ url }) => {

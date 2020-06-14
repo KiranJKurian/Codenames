@@ -18,7 +18,9 @@ const typeDef = `
     winner: Side
     board: [Tile]!
     remainingRed: Int!
+    masterRed: String
     remainingBlue: Int!
+    masterBlue: String
   }
 `;
 

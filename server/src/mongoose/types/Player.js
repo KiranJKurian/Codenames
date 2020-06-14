@@ -10,10 +10,6 @@ const PlayerSchema = new mongoose.Schema({
     trim: true,
     validate: value => value.length > 0,
   },
-  isMaster: {
-    type: Boolean,
-    default: false,
-  },
   side: {
     type: String,
     required: true,

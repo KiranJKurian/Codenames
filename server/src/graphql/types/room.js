@@ -2,7 +2,7 @@ const { Room, createRoom } = require('../../mongoose/types/Room');
 
 const typeDef = `
   extend type Query {
-    room(roomCode: String!): Room
+    room(roomCode: String! name: String): Room
   }
 
   extend type Mutation {

@@ -16,7 +16,7 @@ const typeDef = `
   type Tile {
     id: ID!
     word: String!
-    side: Side!
+    side: Side
     picked: Boolean!
   }
 `;
@@ -41,7 +41,8 @@ const resolvers = {
             if (
               winner !== null ||
               playerToValidate.side !== turn ||
-              playerToValidate.isMaster ||
+              game.masterRed === name ||
+              game.masterBlue === name ||
               !matchedTile ||
               matchedTile.picked
             ) {
@@ -93,6 +94,16 @@ const resolvers = {
   },
   Tile: {
     id: ({ _id: id }) => id,
+    side: ({ side, picked }, _, { player, currentGame }) => {
+      if (picked) {
+        return side;
+      }
+
+      if (player.name === currentGame.masterRed || player.name === currentGame.masterBlue) {
+        return side;
+      }
+      return null;
+    },
   },
 };
 

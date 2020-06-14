@@ -4,8 +4,8 @@ const { Sides } = require('../../constants');
 const typeDef = `
   extend type Mutation {
     addPlayer(name: String! side: Side roomCode: String!): PlayerMutationResponse
-    promotePlayer(name: String! roomCode: String!): PlayerMutationResponse
-    demotePlayer(name: String! roomCode: String!): PlayerMutationResponse
+    promotePlayer(name: String! roomCode: String!): MasterMutationResponse
+    demotePlayer(name: String! roomCode: String!): MasterMutationResponse
     switchTeam(name: String! roomCode: String!): PlayerMutationResponse
     removePlayer(name: String! roomCode: String!): RemovePlayerMutationResponse
   }
@@ -15,6 +15,13 @@ const typeDef = `
     success: Boolean!
     message: String!
     player: Player
+  }
+
+  type MasterMutationResponse implements MutationResponse {
+    code: String!
+    success: Boolean!
+    message: String!
+    game: Game
   }
 
   type RemovePlayerMutationResponse implements MutationResponse {
@@ -27,7 +34,6 @@ const typeDef = `
     id: ID!
     name: String!
     side: Side!
-    isMaster: Boolean!
   }
 `;
 
@@ -61,17 +67,25 @@ const resolvers = {
 
     demotePlayer: async (_, { name, roomCode }) => {
       try {
-        const player = await Room.findOne({ roomCode }, { players: { $elemMatch: { name } } })
+        const game = await Room.findOne(
+          { roomCode },
+          { games: { $slice: -1 }, players: { $elemMatch: { name } } }
+        )
           .then(room => {
             const {
               players: [playerToDemote],
+              games: [currentGame],
             } = room;
-            playerToDemote.isMaster = false;
-            return room.save().then(() => playerToDemote);
+            if (playerToDemote.side === Sides.RED && currentGame.masterRed === name) {
+              currentGame.masterRed = null;
+            } else if (playerToDemote.side === Sides.BLUE && currentGame.masterBlue === name) {
+              currentGame.masterBlue = null;
+            }
+            return room.save().then(() => currentGame);
           })
           .catch(() => null);
 
-        if (player === null) {
+        if (game === null) {
           throw new Error(`Could not demote player ${name} of room ${roomCode}`);
         }
 
@@ -79,7 +93,7 @@ const resolvers = {
           code: '200',
           success: true,
           message: 'Demoted player',
-          player,
+          game,
         };
       } catch (e) {
         return {
@@ -92,27 +106,36 @@ const resolvers = {
 
     promotePlayer: async (_, { name, roomCode }) => {
       try {
-        const player = await Room.findOne(
+        const game = await Room.findOne(
           { roomCode },
-          { players: { $elemMatch: { isMaster: true } } }
+          { games: { $slice: -1 }, players: { $elemMatch: { name } } }
         )
-          .then(room => {
-            if (room.players.length > 0) {
-              throw new Error();
-            }
-
-            return Room.findOne({ roomCode }, { players: { $elemMatch: { name } } });
-          })
           .then(room => {
             const {
               players: [playerToPromote],
+              games: [currentGame],
             } = room;
-            playerToPromote.isMaster = true;
-            return room.save().then(() => playerToPromote);
+            if (playerToPromote.side === Sides.RED) {
+              if (currentGame.masterRed !== null) {
+                throw new Error(
+                  `Could not promote player ${name} of room ${roomCode}. Another master for team ${playerToPromote.side} currently exists: ${currentGame.masterRed}`
+                );
+              }
+              currentGame.masterRed = name;
+            } else if (playerToPromote.side === Sides.BLUE) {
+              if (currentGame.masterBlue !== null) {
+                throw new Error(
+                  `Could not promote player ${name} of room ${roomCode}. Another master for team ${playerToPromote.side} currently exists: ${currentGame.masterBlue}`
+                );
+              }
+              currentGame.masterBlue = name;
+            }
+
+            return room.save().then(() => currentGame);
           })
           .catch(() => null);
 
-        if (player === null) {
+        if (game === null) {
           throw new Error(`Could not promote player ${name} of room ${roomCode}`);
         }
 
@@ -120,7 +143,7 @@ const resolvers = {
           code: '200',
           success: true,
           message: 'Promoted player',
-          player,
+          game,
         };
       } catch (e) {
         return {
@@ -133,13 +156,17 @@ const resolvers = {
 
     switchTeam: async (_, { name, roomCode }) => {
       try {
-        const player = await Room.findOne({ roomCode }, { players: { $elemMatch: { name } } })
+        const player = await Room.findOne(
+          { roomCode },
+          { games: { $slice: -1 }, players: { $elemMatch: { name } } }
+        )
           .then(room => {
             const {
               players: [playerToSwitch],
+              games: [currentGame],
             } = room;
 
-            if (playerToSwitch.isMaster) {
+            if (currentGame.masterRed === name || currentGame.masterBlue === name) {
               throw new Error();
             }
             playerToSwitch.side = playerToSwitch.side === Sides.RED ? Sides.BLUE : Sides.RED;

@@ -22,9 +22,17 @@ const GameSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  masterRed: {
+    type: String,
+    default: null,
+  },
   remainingBlue: {
     type: Number,
     default: 0,
+  },
+  masterBlue: {
+    type: String,
+    default: null,
   },
   // teams: [TeamSchema],
 });
