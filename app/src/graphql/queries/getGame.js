@@ -2,7 +2,7 @@ import { gql } from 'apollo-boost';
 import { useQuery } from '@apollo/react-hooks';
 
 export const GET_GAME = gql`
-  query getGame($game: ID! $isMaster: Boolean = false) {
+  query getGame($game: ID!) {
     game(game: $game) {
       game
       board {
@@ -10,7 +10,7 @@ export const GET_GAME = gql`
         tiles {
           tile
           word
-          side @include(if: $isMaster)
+          side
         }
       }
       teams {
@@ -34,8 +34,8 @@ export const GET_GAME = gql`
   }
 `;
 
-export const useGame = (game, isMaster = false) =>
+export const useGame = game =>
   useQuery(GET_GAME, {
-    variables: { game, isMaster },
+    variables: { game },
     pollInterval: 3000,
   });

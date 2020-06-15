@@ -99,7 +99,10 @@ const resolvers = {
         return side;
       }
 
-      if (player.name === currentGame.masterRed || player.name === currentGame.masterBlue) {
+      if (
+        player &&
+        (player.name === currentGame.masterRed || player.name === currentGame.masterBlue)
+      ) {
         return side;
       }
       return null;

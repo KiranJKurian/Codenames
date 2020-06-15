@@ -2,19 +2,15 @@ import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 
 export const CREATE_PLAYER = gql`
-  mutation createPlayer(
-    $player: ID!
-    $team: ID!
-    $game: ID!
-  ) {
-    player(
-      player: $player
-      team: $team
-      game: $game
-    ) {
+  mutation addPlayer($name: String!, $roomCode: String!) {
+    addPlayer(name: $name, roomCode: $roomCode) {
+      code
       success
-      status
-      error
+      message
+      player {
+        name
+        side
+      }
     }
   }
 `;

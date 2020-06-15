@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Paper,
-  makeStyles,
-  Grid,
-  Button,
-} from '@material-ui/core';
+import { Paper, makeStyles, Grid, Button } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -14,7 +9,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Board = ({ codenames, onTileClick, player, isMaster }) => {
+const sideColor = {
+  BLUE: 'primary',
+  RED: 'secondary',
+  YELLOW: undefined,
+};
+
+const Board = ({ codenames, onTileClick, player }) => {
   const classes = useStyles();
 
   return (
@@ -25,10 +26,9 @@ const Board = ({ codenames, onTileClick, player, isMaster }) => {
             <Button
               variant={picked ? 'contained' : 'outlined'}
               // eslint-disable-next-line no-nested-ternary
-              color={side ? side === 'BLUE' ? 'primary' : 'secondary' : undefined}
+              color={sideColor[side]}
               className={classes.button}
-              disabled={!player}
-              onClick={isMaster ? () => {} : onTileClick(tile)}
+              onClick={onTileClick(word)}
             >
               {word}
             </Button>

@@ -8,21 +8,19 @@ import { GameContext } from '#context/gameContext';
 import { useRoom } from '#graphql/queries/getRoom';
 import Board from '../Board';
 
-const isPlayerMaster = (teams = [], player = null) => teams.some(({
-  master,
-}) => master && master.player === player);
+const isPlayerMaster = (teams = [], player = null) =>
+  teams.some(({ master }) => master && master.player === player);
 
 const GameBoard = ({ roomCode }) => {
-  const { setBoard } = useContext(GameContext);
-  const [isMaster, setIsMaster] = useState(false);
+  const { name } = useContext(GameContext);
 
   const {
     loading: loadingTiles,
     error: errorTiles,
-    data: {
-      room,
-    } = {},
-  } = useRoom(roomCode);
+    data: { room } = {},
+  } = useRoom(roomCode, name);
+
+  const [pickTile] = usePickTile(roomCode, name);
 
   const {
     currentGame: {
@@ -79,7 +77,6 @@ const GameBoard = ({ roomCode }) => {
   // } = useScoreAndPicked(board, game, { skip: board === undefined });
 
   // const [pickTile] = usePickTile(board, game);
-  const pickedTiles = tiles.filter(({ picked }) => picked);
 
   if (errorTiles) {
     return <div>Oops, looks like we got an error. Please try again later</div>;
@@ -89,26 +86,26 @@ const GameBoard = ({ roomCode }) => {
     return <div>Loading...</div>;
   }
 
-  const codenames = tiles.reduce((acc, curr) => {
-    const pickedTile = pickedTiles.find(({ tile }) => tile === curr.tile);
-    const tile = { picked: false, side: null, ...curr };
+  // const codenames = tiles.reduce((acc, curr) => {
+  //   const pickedTile = pickedTiles.find(({ tile }) => tile === curr.tile);
+  //   const tile = { picked: false, side: null, ...curr };
 
-    if (pickedTile) {
-      tile.picked = true;
-      tile.side = pickedTile.side;
-    }
+  //   if (pickedTile) {
+  //     tile.picked = true;
+  //     tile.side = pickedTile.side;
+  //   }
 
-    return [
-      ...acc,
-      tile,
-    ];
-  }, []);
+  //   return [
+  //     ...acc,
+  //     tile,
+  //   ];
+  // }, []);
 
-  const handleTileClick = tile => () => {
-    console.log(`Selected ${tile}`);
-    // pickTile({
-    //   variables: { tile, player, game },
-    // });
+  const handleTileClick = word => () => {
+    console.log(`Selected ${word}`);
+    pickTile({
+      variables: { roomCode, name, word },
+    });
   };
 
   return (
@@ -118,9 +115,8 @@ const GameBoard = ({ roomCode }) => {
           <Grid item xs={12}>
             <Board
               onTileClick={handleTileClick}
-              codenames={codenames}
+              codenames={tiles}
               // player={player}
-              isMaster={isMaster}
             />
           </Grid>
         </Grid>

@@ -2,8 +2,8 @@ import { gql } from 'apollo-boost';
 import { useQuery } from '@apollo/react-hooks';
 
 export const GET_ROOM = gql`
-  query getRoom($roomCode: String!) {
-    room(roomCode: $roomCode) {
+  query getRoom($roomCode: String!, $name: String) {
+    room(roomCode: $roomCode, name: $name) {
       id
       roomCode
       games {
@@ -23,7 +23,6 @@ export const GET_ROOM = gql`
         id
         name
         side
-        isMaster
       }
       currentGame {
         id
@@ -36,13 +35,16 @@ export const GET_ROOM = gql`
           picked
         }
         remainingRed
+        masterRed
         remainingBlue
+        masterBlue
       }
     }
   }
 `;
 
-export const useRoom = roomCode => useQuery(GET_ROOM, {
-  variables: { roomCode },
-  pollInterval: 3000,
-});
+export const useRoom = (roomCode, name) =>
+  useQuery(GET_ROOM, {
+    variables: { roomCode, name },
+    pollInterval: 3000,
+  });

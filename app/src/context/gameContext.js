@@ -2,33 +2,18 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 export const GameContext = React.createContext({
-  player: null,
-  setPlayer: () => {},
-  team: null,
-  setTeam: () => {},
-  game: null,
-  setGame: () => {},
-  board: null,
-  setBoard: () => {},
+  name: '',
+  setName: () => {},
 });
 
 export const GameContextProvider = ({ children }) => {
-  const [player, setPlayer] = useState(null);
-  const [team, setTeam] = useState(null);
-  const [game, setGame] = useState(null);
-  const [board, setBoard] = useState(null);
+  const [name, setName] = useState('');
 
   return (
     <GameContext.Provider
       value={{
-        player,
-        setPlayer,
-        team,
-        setTeam,
-        game,
-        setGame,
-        board,
-        setBoard,
+        name,
+        setName,
       }}
     >
       {children}
