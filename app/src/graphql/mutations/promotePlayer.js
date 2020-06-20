@@ -2,25 +2,22 @@ import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 import { GET_ROOM } from '#graphql/queries/getRoom';
 
-export const PICK_TILE = gql`
-  mutation pickTile($word: String!, $name: String!, $roomCode: String!) {
-    pickTile(name: $name, roomCode: $roomCode, word: $word) {
-      code
+export const PROMOTE_PLAYER = gql`
+  mutation promotePlayer($name: String! $roomCode: String!) {
+    promotePlayer(name: $name roomCode: $roomCode) {
       success
       message
-      tile {
+      game {
         id
-        word
-        side
-        picked
+        masterRed
+        masterBlue
       }
     }
   }
 `;
 
-export const usePickTile = (roomCode, name) =>
-  useMutation(PICK_TILE, {
-    refetchQueries: ({ data: { pickTile: { error, success } = {} } = {} } = {}) => {
+export const usePromotePlayer = (roomCode, name) => useMutation(PROMOTE_PLAYER, {
+    refetchQueries: ({ data: { promotePlayer: { error, success } = {} } = {} } = {}) => {
       if (error) {
         window.alert(error);
       }

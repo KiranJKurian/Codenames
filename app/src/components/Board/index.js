@@ -15,7 +15,7 @@ const sideColor = {
   YELLOW: undefined,
 };
 
-const Board = ({ codenames, onTileClick, player }) => {
+const Board = ({ codenames, onTileClick }) => {
   const classes = useStyles();
 
   return (
