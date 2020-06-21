@@ -97,7 +97,13 @@ const GameBoard = ({ roomCode }) => {
           </Grid>
         </Grid>
       </Grid>
-      {turn === player.side && <EndTurnFab side={player.side} />}
+      {turn === player.side && (
+        <EndTurnFab
+          side={player.side}
+          roomCode={roomCode}
+          name={name}
+        />
+      )}
     </Grid>
   );
 };

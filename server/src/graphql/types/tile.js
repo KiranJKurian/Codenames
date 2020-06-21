@@ -61,9 +61,9 @@ const resolvers = {
               }
             }
 
-            if (turn === Sides.RED) {
+            if (turn === Sides.RED && matchedTile.side !== Sides.RED) {
               game.turn = Sides.BLUE;
-            } else if (turn === Sides.BLUE) {
+            } else if (turn === Sides.BLUE && matchedTile.side !== Sides.BLUE) {
               game.turn = Sides.RED;
             }
 
@@ -100,8 +100,9 @@ const resolvers = {
       }
 
       if (
-        player &&
-        (player.name === currentGame.masterRed || player.name === currentGame.masterBlue)
+        currentGame.winner ||
+        (player &&
+          (player.name === currentGame.masterRed || player.name === currentGame.masterBlue))
       ) {
         return side;
       }
