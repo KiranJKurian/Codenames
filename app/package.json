@@ -8,6 +8,9 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/system": "^4.9.14",
     "@svgr/webpack": "^4.3.3",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
     "apollo-boost": "^0.4.9",
     "camelcase": "^5.3.1",
     "dotenv-expand": "^5.1.0",
@@ -18,12 +21,10 @@
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
     "react-transition-group": "^4.4.1",
+    "recoil": "0.0.10",
     "resolve": "^1.17.0",
     "semver": "^6.3.0",
-    "styled-components": "^5.1.1",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1"
+    "styled-components": "^5.1.1"
   },
   "scripts": {
     "start": "node scripts/start.js",

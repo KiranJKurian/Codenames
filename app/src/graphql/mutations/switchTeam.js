@@ -1,6 +1,9 @@
 import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
+import { useParams } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 import { GET_ROOM } from '#graphql/queries/getRoom';
+import nameState from '#recoil/atoms/name';
 
 export const SWITCH_TEAM = gql`
     mutation switchTeam($name: String! $roomCode: String!) {
@@ -15,7 +18,11 @@ export const SWITCH_TEAM = gql`
     }
 `;
 
-export const useSwitchTeam = (roomCode, name) => useMutation(SWITCH_TEAM, {
+export const useSwitchTeam = () => {
+  const { roomCode } = useParams();
+  const name = useRecoilValue(nameState);
+
+  const [switchTeam, ...switchTeamOther] = useMutation(SWITCH_TEAM, {
     refetchQueries: ({ data: { switchTeam: { error, success } = {} } = {} } = {}) => {
       if (error) {
         window.alert(error);
@@ -31,3 +38,10 @@ export const useSwitchTeam = (roomCode, name) => useMutation(SWITCH_TEAM, {
         : [];
     },
   });
+
+  const loadedSwitchTeam = () => switchTeam({
+    variables: { roomCode, name },
+  });
+
+  return [loadedSwitchTeam, ...switchTeamOther];
+};

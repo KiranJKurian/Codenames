@@ -1,14 +1,13 @@
 import React from 'react';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import { useRecoilValue } from 'recoil';
 import { usePromotePlayer } from '#graphql/mutations/promotePlayer';
+import nameState from '#recoil/atoms/name';
 
-const MasterSwitch = ({ masterRed, masterBlue, roomCode, name, team }) => {
-    const [promotePlayer] = usePromotePlayer(roomCode, name);
-
-    const handleChange = () => promotePlayer({
-        variables: { roomCode, name },
-    });
+const MasterSwitch = ({ masterRed, masterBlue, team }) => {
+  const name = useRecoilValue(nameState);  
+  const [promotePlayer] = usePromotePlayer();
 
     const teamHasMaster = (
         (team === 'RED' && masterRed)
@@ -21,7 +20,7 @@ const MasterSwitch = ({ masterRed, masterBlue, roomCode, name, team }) => {
           <Switch
             name="masterSwitch"
             checked={masterRed === name || masterBlue === name}
-            onChange={handleChange}
+            onChange={promotePlayer}
             color={team === 'BLUE' ? 'primary' : 'secondary'}
             disabled={teamHasMaster}
           />

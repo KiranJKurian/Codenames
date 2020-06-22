@@ -14,12 +14,8 @@ const FloatingActionButton = styled(Fab)`
   right: 16px;
 `;
 
-const EndTurnFab = ({ side, roomCode, name }) => {
-  const [endTurn] = useEndTurn(roomCode, name);
-
-  const handleClick = () => endTurn({
-    variables: { roomCode, name },
-  });
+const EndTurnFab = ({ side }) => {
+  const [endTurn] = useEndTurn();
 
   return (
     <FloatingActionButton
@@ -27,7 +23,7 @@ const EndTurnFab = ({ side, roomCode, name }) => {
       color={side === 'BLUE' ? 'primary' : 'secondary'}
       variant="extended"
       aria-labelledby="end-turn-fab"
-      onClick={handleClick}
+      onClick={endTurn}
     >
       <DoneIconWithMargin />
       <span id="end-turn-fab">End {side} Turn</span>

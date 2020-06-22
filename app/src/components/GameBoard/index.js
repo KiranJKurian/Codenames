@@ -1,8 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Grid, useTheme } from '@material-ui/core';
+import { useRecoilValue } from 'recoil';
+import nameState from '#recoil/atoms/name';
 import { usePickTile } from '#graphql/mutations/pickTile';
-import { GameContext } from '#context/gameContext';
 import { useRoom } from '#graphql/queries/getRoom';
 import TeamSwitch from '#components/TeamSwitch';
 import MasterSwitch from '#components/MasterSwitch';
@@ -10,15 +11,15 @@ import EndTurnFab from '#components/EndTurnFab';
 import Board from '../Board';
 
 const GameBoard = ({ roomCode }) => {
-  const { name } = useContext(GameContext);
+  const name = useRecoilValue(nameState);
 
   const {
     loading: loadingTiles,
     error: errorTiles,
     data: { room } = {},
-  } = useRoom(roomCode, name);
+  } = useRoom();
 
-  const [pickTile] = usePickTile(roomCode, name);
+  const [pickTile] = usePickTile();
 
   const {
     palette: {
@@ -49,6 +50,7 @@ const GameBoard = ({ roomCode }) => {
   const player = players.find(({ name: playerName }) => playerName === name) || {};
 
   if (errorTiles) {
+    console.error(errorTiles);
     return <div>Oops, looks like we got an error. Please try again later</div>;
   }
 
@@ -57,9 +59,7 @@ const GameBoard = ({ roomCode }) => {
   }
 
   const handleTileClick = word => () => {
-    pickTile({
-      variables: { roomCode, name, word },
-    });
+    pickTile(word);
   };
 
   return (
@@ -67,21 +67,17 @@ const GameBoard = ({ roomCode }) => {
       <Grid item xs={12}>
         <Grid container direction="column" spacing={2}>
           <Grid item xs={12}>
-          <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <TeamSwitch 
-              disabled={masterRed === name || masterBlue === name}
-              roomCode={roomCode}
-              name={name}
-              team={player.side}
-            />
-            <MasterSwitch
-              masterRed={masterRed}
-              masterBlue={masterBlue}
-              roomCode={roomCode}
-              name={name}
-              team={player.side}
-            />
-          </div>
+            <div style={{display: 'flex', justifyContent: 'space-between', opacity: player.side ? 1 : 0}}>
+              <TeamSwitch 
+                disabled={masterRed === name || masterBlue === name}
+                team={player.side}
+              />
+              <MasterSwitch
+                masterRed={masterRed}
+                masterBlue={masterBlue}
+                team={player.side}
+              />
+            </div>
             <div style={{display: 'flex', justifyContent: 'space-between'}}>
               <h4 style={{ color: turn === 'BLUE' ? primary : primaryDark }}>
                 Blue: {remainingBlue} Left
@@ -100,8 +96,6 @@ const GameBoard = ({ roomCode }) => {
       {turn === player.side && (
         <EndTurnFab
           side={player.side}
-          roomCode={roomCode}
-          name={name}
         />
       )}
     </Grid>

@@ -1,6 +1,9 @@
 import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
+import { useParams } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 import { GET_ROOM } from '#graphql/queries/getRoom';
+import nameState from '#recoil/atoms/name';
 
 export const PICK_TILE = gql`
   mutation pickTile($word: String!, $name: String!, $roomCode: String!) {
@@ -18,8 +21,11 @@ export const PICK_TILE = gql`
   }
 `;
 
-export const usePickTile = (roomCode, name) =>
-  useMutation(PICK_TILE, {
+export const usePickTile = () => {
+  const { roomCode } = useParams();
+  const name = useRecoilValue(nameState);
+
+  const [pickTile, ...pickTileOther] = useMutation(PICK_TILE, {
     refetchQueries: ({ data: { pickTile: { error, success } = {} } = {} } = {}) => {
       if (error) {
         window.alert(error);
@@ -35,3 +41,10 @@ export const usePickTile = (roomCode, name) =>
         : [];
     },
   });
+
+  const loadedPickTile = (word) => pickTile({
+    variables: { roomCode, name, word },
+  });
+
+  return [loadedPickTile, ...pickTileOther];
+};

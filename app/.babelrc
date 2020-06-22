@@ -27,8 +27,8 @@
                     "#constants": [
                         "./src/constants"
                     ],
-                    "#context": [
-                        "./src/context"
+                    "#recoil": [
+                        "./src/recoil"
                     ],
                     "#graphql": [
                         "./src/graphql"

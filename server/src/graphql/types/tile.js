@@ -94,7 +94,7 @@ const resolvers = {
   },
   Tile: {
     id: ({ _id: id }) => id,
-    side: ({ side, picked }, _, { player, currentGame }) => {
+    side: ({ side, picked }, _, { player, currentGame = {} }) => {
       if (picked) {
         return side;
       }

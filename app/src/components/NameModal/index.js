@@ -1,11 +1,12 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardContent, CardHeader, Modal } from '@material-ui/core';
 import styled from 'styled-components';
+import { useRecoilState } from 'recoil';
 import StretchedTextField from '#sc/StretchedTextField';
 import StretchedButton from '#sc/StretchedButton';
-import { GameContext } from '#context/gameContext';
 import { useCreatePlayer } from '#graphql/mutations/createPlayer';
+import nameState from '#recoil/atoms/name';
 
 const FormContainer = styled.div`
   display: flex;
@@ -26,9 +27,7 @@ const SizedCard = styled(Card)`
 
 const NameModal = ({ roomCode }) => {
   const [name, setName] = useState('');
-  const { name: contextName, setName: setContextName } = useContext(
-    GameContext,
-  );
+  const [recoilName, recoilSetName] = useRecoilState(nameState);
   const [createPlayer] = useCreatePlayer();
 
   const onChange = ({ target: { value } }) => {
@@ -46,7 +45,7 @@ const NameModal = ({ roomCode }) => {
         } = {},
       }) => {
         if (success) {
-          setContextName(playerName);
+          recoilSetName(playerName);
         } else {
           window.alert(`Couldn't add player, try again later`);
         }
@@ -58,7 +57,7 @@ const NameModal = ({ roomCode }) => {
     <CenteredModal
       aria-labelledby="name-title"
       aria-describedby="name"
-      open={!contextName}
+      open={!recoilName}
       disableBackdropClick
       disableEscapeKeyDown
     >

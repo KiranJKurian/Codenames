@@ -1,6 +1,9 @@
 import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
+import { useParams } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 import { GET_ROOM } from '#graphql/queries/getRoom';
+import nameState from '#recoil/atoms/name';
 
 export const PROMOTE_PLAYER = gql`
   mutation promotePlayer($name: String! $roomCode: String!) {
@@ -16,7 +19,11 @@ export const PROMOTE_PLAYER = gql`
   }
 `;
 
-export const usePromotePlayer = (roomCode, name) => useMutation(PROMOTE_PLAYER, {
+export const usePromotePlayer = () => {
+  const { roomCode } = useParams();
+  const name = useRecoilValue(nameState);
+
+  const [promotePlayer, ...otherPromotePlayer] = useMutation(PROMOTE_PLAYER, {
     refetchQueries: ({ data: { promotePlayer: { error, success } = {} } = {} } = {}) => {
       if (error) {
         window.alert(error);
@@ -32,3 +39,10 @@ export const usePromotePlayer = (roomCode, name) => useMutation(PROMOTE_PLAYER, 
         : [];
     },
   });
+  
+  const loadedPromotePlayer = () => promotePlayer({
+    variables: { roomCode, name },
+  });
+
+  return [loadedPromotePlayer, ...otherPromotePlayer];
+};

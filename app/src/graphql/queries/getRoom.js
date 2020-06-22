@@ -1,5 +1,8 @@
 import { gql } from 'apollo-boost';
 import { useQuery } from '@apollo/react-hooks';
+import { useParams } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import nameState from '#recoil/atoms/name';
 
 export const GET_ROOM = gql`
   query getRoom($roomCode: String!, $name: String) {
@@ -43,8 +46,12 @@ export const GET_ROOM = gql`
   }
 `;
 
-export const useRoom = (roomCode, name) =>
-  useQuery(GET_ROOM, {
+export const useRoom = () => {
+  const { roomCode } = useParams();
+  const name = useRecoilValue(nameState);
+
+  return useQuery(GET_ROOM, {
     variables: { roomCode, name },
     pollInterval: 3000,
   });
+};

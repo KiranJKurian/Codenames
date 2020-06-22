@@ -9,12 +9,15 @@ import {
 } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { useHistory } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
 import Logo from '#sc/Logo';
 import LogoAndNameWrapper from '#sc/LogoAndNameWrapper';
+import nameState from '#recoil/atoms/name';
 import logo from '../../logo.svg';
 
 const AppBarWithLogout = () => {
   const { push } = useHistory();
+  const setName = useSetRecoilState(nameState);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -27,7 +30,10 @@ const AppBarWithLogout = () => {
     setAnchorEl(null);
   };
 
-  const navigateToLogin = () => push('');
+  const logout = () => {
+    push('');
+    setName('');
+  };
 
   return (
     <AppBar>
@@ -52,7 +58,7 @@ const AppBarWithLogout = () => {
             open={open}
             onClose={handleClose}
           >
-            <MenuItem onClick={navigateToLogin}>Logout</MenuItem>
+            <MenuItem onClick={logout}>Logout</MenuItem>
           </Menu>
         </div>
       </Toolbar>
