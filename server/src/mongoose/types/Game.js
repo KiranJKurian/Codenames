@@ -1,9 +1,11 @@
+import { ActionTypes } from '../../constants';
+
 const mongoose = require('mongoose');
 const { TileSchema } = require('./Tile');
 const { generateTiles } = require('../../tiles');
 const { defaultNumWords, Sides } = require('../../constants');
 
-const GameSchema = new mongoose.Schema({
+export const GameSchema = new mongoose.Schema({
   turn: {
     type: String,
     validate: value => value in Sides,
@@ -55,6 +57,26 @@ GameSchema.methods.createBoard = function createBoard(numTiles = defaultNumWords
   this.remainingBlue += numOfSide(Sides.BLUE);
 };
 
-module.exports = {
-  GameSchema,
+export function createGame() {
+  this.games.push({});
+  this.games[this.games.length - 1].createBoard();
+  return this.save();
+}
+
+export function getCurrentGame() {
+  return this.games[this.games.length - 1];
+}
+
+function gameExists(gameId) {
+  return this.games.some(({ id }) => id === gameId);
+}
+
+export const gameActionValidations = {
+  [ActionTypes.NEW_GAME]: ({ gameId }) => {
+    const valid = gameExists(gameId);
+    return {
+      valid,
+      error: valid ? null : new Error(`Game does not exist: ${gameId}`),
+    };
+  },
 };

@@ -1,7 +1,9 @@
+import { ActionTypes } from '../../constants';
+
 const mongoose = require('mongoose');
 const { Sides } = require('../../constants');
 
-const TileSchema = new mongoose.Schema({
+export const TileSchema = new mongoose.Schema({
   word: {
     type: String,
     required: true,
@@ -15,6 +17,18 @@ const TileSchema = new mongoose.Schema({
   },
 });
 
-module.exports = {
-  TileSchema,
+function wordExistsAndIsPicked(wordToSearch) {
+  const currentGame = this.getCurrentGame();
+  const pickedWord = currentGame.board.find(({ word }) => word === wordToSearch) || {};
+  return pickedWord.picked;
+}
+
+export const tileActionValidations = {
+  [ActionTypes.TILE_PICKED]: ({ word }) => {
+    const valid = wordExistsAndIsPicked(word);
+    return {
+      valid,
+      error: valid ? null : new Error(`Word is not picked: ${word}`),
+    };
+  },
 };

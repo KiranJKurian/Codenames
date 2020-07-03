@@ -1,18 +1,22 @@
-const defaultNumWords = 25;
+export const defaultNumWords = 25;
 
-const GameTypes = Object.freeze({
+export const GameTypes = Object.freeze({
   CODENAMES: 'CODENAMES',
   DEEP_UNDERCOVER: 'DEEP_UNDERCOVER',
 });
 
-const Sides = Object.freeze({
+export const Sides = Object.freeze({
   RED: 'RED',
   BLUE: 'BLUE',
   YELLOW: 'YELLOW',
 });
 
-module.exports = {
-  defaultNumWords,
-  GameTypes,
-  Sides,
-};
+export const ActionTypes = Object.freeze({
+  ADD_PLAYER: 'ADD_PLAYER',
+  REMOVE_PLAYER: 'REMOVE_PLAYER',
+  PROMOTE_PLAYER: 'PROMOTE_PLAYER',
+  DEMOTE_PLAYER: 'DEMOTE_PLAYER',
+  NEW_GAME: 'NEW_GAME',
+  TILE_PICKED: 'TILE_PICKED',
+  SWITCH_TEAM: 'SWITCH_TEAM',
+});
