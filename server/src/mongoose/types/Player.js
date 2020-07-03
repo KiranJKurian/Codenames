@@ -21,6 +21,10 @@ export function playerExists(nameToSearch) {
   return this.players.some(({ name: currentPlayerName }) => currentPlayerName === nameToSearch);
 }
 
+export function findPlayer(nameToSearch) {
+  return this.players.find(({ name: currentPlayerName }) => currentPlayerName === nameToSearch);
+}
+
 export function playerIsMaster(nameToSearch) {
   const currentGame = this.getCurrentGame();
   return currentGame.masterRed === nameToSearch || currentGame.masterBlue === nameToSearch;
@@ -37,6 +41,13 @@ export function playerExistsAndIsMaster(nameToSearch) {
 
 export function playerExistsAndIsNotMaster(nameToSearch) {
   return playerExists(nameToSearch) && playerIsNotMaster(nameToSearch);
+}
+
+export function playerExistsAndIsNotPlayersTurn(nameToSearch) {
+  const currentGame = this.getCurrentGame();
+  const player = findPlayer(nameToSearch);
+
+  return player && currentGame.turn !== player.side;
 }
 
 export const playerActionValidations = {
@@ -74,6 +85,13 @@ export const playerActionValidations = {
     return {
       valid,
       error: valid ? null : new Error(`Player does not exist: ${playerName}`),
+    };
+  },
+  [ActionTypes.END_TURN]: ({ playerName }) => {
+    const valid = playerExistsAndIsNotPlayersTurn(playerName);
+    return {
+      valid,
+      error: valid ? null : new Error(`Player did not end turn: ${playerName}`),
     };
   },
 };

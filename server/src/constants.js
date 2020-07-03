@@ -19,4 +19,5 @@ export const ActionTypes = Object.freeze({
   NEW_GAME: 'NEW_GAME',
   TILE_PICKED: 'TILE_PICKED',
   SWITCH_TEAM: 'SWITCH_TEAM',
+  END_TURN: 'END_TURN',
 });
