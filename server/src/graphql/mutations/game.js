@@ -1,3 +1,5 @@
+import { ActionTypes } from '../../constants';
+
 const { Room } = require('../../mongoose/types/Room');
 const { Sides } = require('../../constants');
 
@@ -5,8 +7,16 @@ export const createGame = async roomCode => {
   try {
     const game = Room.findOne({ roomCode })
       .then(room => room.createGame())
-      .then(room => room.games[room.games.length - 1])
-      .catch(() => null);
+      .then(room => {
+        const newGame = room.games[room.games.length - 1];
+        room.addAction({ type: ActionTypes.NEW_GAME, gameId: newGame.id });
+
+        return newGame;
+      })
+      .catch(e => {
+        console.error(e);
+        return null;
+      });
 
     if (game === null) {
       throw new Error(`Could not create game in room ${roomCode}`);
@@ -31,7 +41,7 @@ export const endTurn = async (name, roomCode) => {
   try {
     const game = await Room.findOne(
       { roomCode },
-      { games: { $slice: -1 }, players: { $elemMatch: { name } } }
+      { games: { $slice: -1 }, players: { $elemMatch: { name } }, actions: 1 }
     )
       .then(room => {
         const {
@@ -43,9 +53,15 @@ export const endTurn = async (name, roomCode) => {
           throw new Error();
         }
         currentGame.turn = currentGame.turn === Sides.RED ? Sides.BLUE : Sides.RED;
-        return room.save().then(() => currentGame);
+        return room
+          .save()
+          .then(() => room.addAction({ type: ActionTypes.END_TURN, playerName: name }))
+          .then(() => currentGame);
       })
-      .catch(() => null);
+      .catch(e => {
+        console.error(e);
+        return null;
+      });
 
     if (game === null) {
       throw new Error(`Could not end turn of player ${name} of room ${roomCode}`);

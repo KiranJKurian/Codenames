@@ -1,16 +1,28 @@
+import { ActionTypes } from '../../constants';
+
 const { Room } = require('../../mongoose/types/Room');
 const { Sides } = require('../../constants');
 
 export const addPlayer = async (name, side = null, roomCode) => {
   try {
     // If extra logic is needed reimplement Room.methods.addPlayer
-    const newPlayer = await Room.findOne({ roomCode })
-      .then(room => {
-        return room.players.find(player => player.name === name) || room.addPlayer(name, side);
+    const addedPlayer = Room.findOne({ roomCode })
+      .then(room =>
+        Promise.all([
+          room,
+          room.players.find(player => player.name === name) || room.addPlayer(name, side),
+        ])
+      )
+      .then(([room, player]) => {
+        room.addAction({ type: ActionTypes.ADD_PLAYER, playerName: player.name });
+        return player;
       })
-      .catch(() => null);
+      .catch(e => {
+        console.error(e);
+        return null;
+      });
 
-    if (newPlayer === null) {
+    if (addedPlayer === null) {
       throw new Error(`Could not add player to room ${roomCode}`);
     }
 
@@ -18,7 +30,7 @@ export const addPlayer = async (name, side = null, roomCode) => {
       code: '200',
       success: true,
       message: 'Created player',
-      player: newPlayer,
+      player: addedPlayer,
     };
   } catch (e) {
     return {
@@ -33,7 +45,7 @@ export const demotePlayer = async (name, roomCode) => {
   try {
     const game = await Room.findOne(
       { roomCode },
-      { games: { $slice: -1 }, players: { $elemMatch: { name } } }
+      { games: { $slice: -1 }, players: { $elemMatch: { name } }, actions: 1 }
     )
       .then(room => {
         const {
@@ -45,9 +57,15 @@ export const demotePlayer = async (name, roomCode) => {
         } else if (playerToDemote.side === Sides.BLUE && currentGame.masterBlue === name) {
           currentGame.masterBlue = null;
         }
-        return room.save().then(() => currentGame);
+        return room
+          .save()
+          .then(() => room.addAction({ type: ActionTypes.DEMOTE_PLAYER, playerName: name }))
+          .then(() => currentGame);
       })
-      .catch(() => null);
+      .catch(e => {
+        console.error(e);
+        return null;
+      });
 
     if (game === null) {
       throw new Error(`Could not demote player ${name} of room ${roomCode}`);
@@ -72,7 +90,7 @@ export const promotePlayer = async (name, roomCode) => {
   try {
     const game = await Room.findOne(
       { roomCode },
-      { games: { $slice: -1 }, players: { $elemMatch: { name } } }
+      { games: { $slice: -1 }, players: { $elemMatch: { name } }, actions: 1 }
     )
       .then(room => {
         const {
@@ -95,7 +113,10 @@ export const promotePlayer = async (name, roomCode) => {
           currentGame.masterBlue = name;
         }
 
-        return room.save().then(() => currentGame);
+        return room
+          .save()
+          .then(() => room.addAction({ type: ActionTypes.PROMOTE_PLAYER, playerName: name }))
+          .then(() => currentGame);
       })
       .catch(() => null);
 
@@ -122,7 +143,7 @@ export const switchTeam = async (name, roomCode) => {
   try {
     const player = await Room.findOne(
       { roomCode },
-      { games: { $slice: -1 }, players: { $elemMatch: { name } } }
+      { games: { $slice: -1 }, players: { $elemMatch: { name } }, actions: 1 }
     )
       .then(room => {
         const {
@@ -134,7 +155,10 @@ export const switchTeam = async (name, roomCode) => {
           throw new Error();
         }
         playerToSwitch.side = playerToSwitch.side === Sides.RED ? Sides.BLUE : Sides.RED;
-        return room.save().then(() => playerToSwitch);
+        return room
+          .save()
+          .then(() => room.addAction({ type: ActionTypes.SWITCH_TEAM, playerName: name }))
+          .then(() => playerToSwitch);
       })
       .catch(() => null);
 
@@ -159,16 +183,20 @@ export const switchTeam = async (name, roomCode) => {
 
 export const removePlayer = async (name, roomCode) => {
   try {
-    demotePlayer(name, roomCode);
-
-    const player = await Room.findOneAndUpdate(
-      { roomCode },
-      { $pull: { players: { name } } },
-      { useFindAndModify: false }
-    ).catch(e => {
-      console.log(e);
-      return null;
-    });
+    // TODO: Investigate optional action creations for removes/demotes/etc when no action is preformed
+    const player = await demotePlayer(name, roomCode)
+      .then(() =>
+        Room.findOneAndUpdate(
+          { roomCode },
+          { $pull: { players: { name } } },
+          { useFindAndModify: false, new: true }
+        )
+      )
+      .then(room => room.addAction({ type: ActionTypes.REMOVE_PLAYER, playerName: name }))
+      .catch(e => {
+        console.error(e);
+        return null;
+      });
 
     if (player === null) {
       throw new Error();

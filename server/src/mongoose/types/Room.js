@@ -1,7 +1,9 @@
-const mongoose = require('mongoose');
-const { GameSchema, createGame, getCurrentGame } = require('./Game');
-const { PlayerSchema, addPlayer } = require('./Player');
-const uniqueId = require('../../utils/uniqueId');
+import mongoose from 'mongoose';
+import { GameSchema } from './Game';
+import { PlayerSchema } from './Player';
+import { ActionSchema } from './Action';
+import { initializeMethods } from '../methods/room';
+import uniqueId from '../../utils/uniqueId';
 
 const modelName = 'Room';
 
@@ -21,13 +23,14 @@ const RoomSchema = new mongoose.Schema({
     type: [PlayerSchema],
     default: [],
   },
+  actions: {
+    type: [ActionSchema],
+    default: [],
+  },
 });
 
-RoomSchema.methods.createGame = createGame;
-
-RoomSchema.methods.getCurrentGame = getCurrentGame;
-
-RoomSchema.methods.addPlayer = addPlayer;
+// Initializes RoomSchemas instance methods
+initializeMethods(RoomSchema);
 
 const Room = mongoose.model(modelName, RoomSchema);
 

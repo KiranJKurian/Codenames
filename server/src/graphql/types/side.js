@@ -1,7 +1,7 @@
-module.exports = `
+import { Sides } from '../../constants';
+
+export default `
   enum Side {
-    RED
-    BLUE
-    YELLOW
+    ${Object.values(Sides).join('\n\t\t')}
   }
 `;

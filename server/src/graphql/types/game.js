@@ -1,6 +1,6 @@
-const { createGame, endTurn } = require('../mutations/game');
+import { createGame, endTurn } from '../mutations/game';
 
-const typeDef = `
+export const typeDef = `
   extend type Mutation {
     createGame(roomCode: String!): GameMutationResponse
     endTurn(name: String! roomCode: String!): GameMutationResponse
@@ -25,7 +25,7 @@ const typeDef = `
   }
 `;
 
-const resolvers = {
+export const resolvers = {
   Mutation: {
     createGame: async (_, { roomCode }) => createGame(roomCode),
     endTurn: async (_, { name, roomCode }) => endTurn(name, roomCode),
@@ -33,9 +33,4 @@ const resolvers = {
   Game: {
     id: ({ _id: id }) => id,
   },
-};
-
-module.exports = {
-  typeDef,
-  resolvers,
 };

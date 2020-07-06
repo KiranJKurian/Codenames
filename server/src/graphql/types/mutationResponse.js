@@ -1,4 +1,4 @@
-const typeDef = `
+export const typeDef = `
   interface MutationResponse {
     code: String!
     success: Boolean!
@@ -6,13 +6,8 @@ const typeDef = `
   }
 `;
 
-const resolvers = {
+export const resolvers = {
   MutationResponse: {
     __resolveType: () => null,
   },
-};
-
-module.exports = {
-  typeDef,
-  resolvers,
 };

@@ -57,23 +57,9 @@ GameSchema.methods.createBoard = function createBoard(numTiles = defaultNumWords
   this.remainingBlue += numOfSide(Sides.BLUE);
 };
 
-export function createGame() {
-  this.games.push({});
-  this.games[this.games.length - 1].createBoard();
-  return this.save();
-}
-
-export function getCurrentGame() {
-  return this.games[this.games.length - 1];
-}
-
-function gameExists(gameId) {
-  return this.games.some(({ id }) => id === gameId);
-}
-
 export const gameActionValidations = {
-  [ActionTypes.NEW_GAME]: ({ gameId }) => {
-    const valid = gameExists(gameId);
+  [ActionTypes.NEW_GAME]: (room, { gameId }) => {
+    const valid = room.gameExists(gameId);
     return {
       valid,
       error: valid ? null : new Error(`Game does not exist: ${gameId}`),

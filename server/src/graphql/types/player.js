@@ -1,12 +1,12 @@
-const {
+import {
   addPlayer,
   demotePlayer,
   promotePlayer,
   switchTeam,
   removePlayer,
-} = require('../mutations/player');
+} from '../mutations/player';
 
-const typeDef = `
+export const typeDef = `
   extend type Mutation {
     addPlayer(name: String! side: Side roomCode: String!): PlayerMutationResponse
     promotePlayer(name: String! roomCode: String!): MasterMutationResponse
@@ -42,7 +42,7 @@ const typeDef = `
   }
 `;
 
-const resolvers = {
+export const resolvers = {
   Mutation: {
     addPlayer: async (_, { name, side = null, roomCode }) => addPlayer(name, side, roomCode),
 
@@ -57,9 +57,4 @@ const resolvers = {
   Player: {
     id: ({ _id: id }) => id,
   },
-};
-
-module.exports = {
-  typeDef,
-  resolvers,
 };

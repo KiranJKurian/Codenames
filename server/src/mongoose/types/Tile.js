@@ -17,15 +17,9 @@ export const TileSchema = new mongoose.Schema({
   },
 });
 
-function wordExistsAndIsPicked(wordToSearch) {
-  const currentGame = this.getCurrentGame();
-  const pickedWord = currentGame.board.find(({ word }) => word === wordToSearch) || {};
-  return pickedWord.picked;
-}
-
 export const tileActionValidations = {
-  [ActionTypes.TILE_PICKED]: ({ word }) => {
-    const valid = wordExistsAndIsPicked(word);
+  [ActionTypes.TILE_PICKED]: (room, { word }) => {
+    const valid = room.wordExistsAndIsPicked(word);
     return {
       valid,
       error: valid ? null : new Error(`Word is not picked: ${word}`),
