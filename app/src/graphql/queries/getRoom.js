@@ -1,8 +1,10 @@
+import { useEffect } from 'react';
 import { gql } from 'apollo-boost';
 import { useQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import nameState from '#recoil/atoms/name';
+import roomState from '#recoil/atoms/room';
 
 export const GET_ROOM = gql`
   query getRoom($roomCode: String!, $name: String) {
@@ -42,6 +44,12 @@ export const GET_ROOM = gql`
         remainingBlue
         masterBlue
       }
+      lastAction {
+        id
+        type
+        playerName
+        word
+      }
     }
   }
 `;
@@ -49,9 +57,16 @@ export const GET_ROOM = gql`
 export const useRoom = () => {
   const { roomCode } = useParams();
   const name = useRecoilValue(nameState);
+  const [recoilRoom, setRecoilRoom] = useRecoilState(roomState);
 
-  return useQuery(GET_ROOM, {
+  const { data: { room } = {} } = useQuery(GET_ROOM, {
     variables: { roomCode, name },
     pollInterval: 3000,
   });
+
+  useEffect(() => {
+    setRecoilRoom(room);
+  }, [room, setRecoilRoom]);
+
+  return recoilRoom;
 };

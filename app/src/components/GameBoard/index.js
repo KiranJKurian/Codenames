@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Grid, useTheme } from '@material-ui/core';
 import { useRecoilValue } from 'recoil';
 import nameState from '#recoil/atoms/name';
@@ -8,16 +7,13 @@ import { useRoom } from '#graphql/queries/getRoom';
 import TeamSwitch from '#components/TeamSwitch';
 import MasterSwitch from '#components/MasterSwitch';
 import EndTurnFab from '#components/EndTurnFab';
+import ActionSnack from '#components/ActionSnack';
 import Board from '../Board';
 
-const GameBoard = ({ roomCode }) => {
+const GameBoard = () => {
   const name = useRecoilValue(nameState);
 
-  const {
-    loading: loadingTiles,
-    error: errorTiles,
-    data: { room } = {},
-  } = useRoom();
+  const room = useRoom();
 
   const [pickTile] = usePickTile();
 
@@ -49,14 +45,14 @@ const GameBoard = ({ roomCode }) => {
 
   const player = players.find(({ name: playerName }) => playerName === name) || {};
 
-  if (errorTiles) {
-    console.error(errorTiles);
-    return <div>Oops, looks like we got an error. Please try again later</div>;
-  }
+  // if (errorTiles) {
+  //   console.error(errorTiles);
+  //   return <div>Oops, looks like we got an error. Please try again later</div>;
+  // }
 
-  if (loadingTiles) {
-    return <div>Loading...</div>;
-  }
+  // if (loadingTiles) {
+  //   return <div>Loading...</div>;
+  // }
 
   const handleTileClick = word => () => {
     pickTile(word);
@@ -98,16 +94,9 @@ const GameBoard = ({ roomCode }) => {
           side={player.side}
         />
       )}
+      <ActionSnack />
     </Grid>
   );
-};
-
-GameBoard.propTypes = {
-  roomCode: PropTypes.string,
-};
-
-GameBoard.defaultProps = {
-  roomCode: null,
 };
 
 export default GameBoard;
