@@ -6,6 +6,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { ThemeProvider as MuiThemeProvider, createMuiTheme } from '@material-ui/core';
 import { ThemeProvider } from 'styled-components';
+import Footer from '#components/Footer';
 import { GRAPHQL_URI } from './constants';
 import './App.css';
 import LoginView from './views/LoginView';
@@ -40,6 +41,7 @@ const App = () => (
               </Switch>
             </Router>
           </AppContainer>
+          <Footer />
         </ThemeProvider>
       </MuiThemeProvider>
     </ApolloProvider>

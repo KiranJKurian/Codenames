@@ -2,7 +2,7 @@ import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { ActionTypes, Sides } from '#constants';
 import { actionState, gameState } from '#recoil/selectors';
-import TeamColor from '#components/TeamColor';
+import TeamColor from '#sc/TeamColor';
 
 const useActionMessage = () => {
   const { playerName, playerSide, type, word } = useRecoilValue(actionState);
