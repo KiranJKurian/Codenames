@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { GET_ROOM } from '#graphql/queries/getRoom';
-import nameState from '#recoil/atoms/name';
+import { nameState } from '#recoil/atoms';
 
 export const END_TURN = gql`
   mutation endTurn($name: String! $roomCode: String!) {

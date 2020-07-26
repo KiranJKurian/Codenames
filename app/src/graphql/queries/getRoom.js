@@ -3,8 +3,7 @@ import { gql } from 'apollo-boost';
 import { useQuery } from '@apollo/react-hooks';
 import { useParams } from 'react-router-dom';
 import { useRecoilValue, useRecoilState } from 'recoil';
-import nameState from '#recoil/atoms/name';
-import roomState from '#recoil/atoms/room';
+import { roomState, nameState } from '#recoil/atoms';
 
 export const GET_ROOM = gql`
   query getRoom($roomCode: String!, $name: String) {
@@ -48,6 +47,7 @@ export const GET_ROOM = gql`
         id
         type
         playerName
+        playerSide
         word
       }
     }

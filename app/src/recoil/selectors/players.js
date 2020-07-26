@@ -1,5 +1,5 @@
 import { selector } from 'recoil';
-import roomState from '../atoms/room';
+import { roomState } from '../atoms';
 
 export const playersState = selector({
   key: 'playersState',

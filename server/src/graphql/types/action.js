@@ -4,6 +4,7 @@ export const typeDef = `
     id: ID!
     type: ActionType!
     playerName: String
+    playerSide: Side
     gameId: String
     word: String
   }

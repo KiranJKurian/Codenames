@@ -55,7 +55,12 @@ export const pickTile = async (name, word, roomCode) => {
         return room
           .save()
           .then(() =>
-            room.addAction({ type: ActionTypes.TILE_PICKED, word, playerName: playerPicked.name })
+            room.addAction({
+              type: ActionTypes.TILE_PICKED,
+              word,
+              playerName: playerPicked.name,
+              playerSide: playerToValidate.side,
+            })
           )
           .then(() => matchedTile);
       })

@@ -6,7 +6,7 @@ import { useRecoilState } from 'recoil';
 import StretchedTextField from '#sc/StretchedTextField';
 import StretchedButton from '#sc/StretchedButton';
 import { useCreatePlayer } from '#graphql/mutations/createPlayer';
-import nameState from '#recoil/atoms/name';
+import { nameState } from '#recoil/atoms';
 
 const FormContainer = styled.div`
   display: flex;

@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
-const { Sides, ActionTypes } = require('../../constants');
-
-const playerSides = [Sides.RED, Sides.BLUE];
+const { PlayerSides, ActionTypes } = require('../../constants');
 
 export const PlayerSchema = new mongoose.Schema({
   name: {
@@ -13,7 +11,7 @@ export const PlayerSchema = new mongoose.Schema({
   side: {
     type: String,
     required: true,
-    validate: value => playerSides.includes(value),
+    validate: value => PlayerSides.includes(value),
   },
 });
 

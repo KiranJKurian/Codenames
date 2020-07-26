@@ -2,15 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Snackbar } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
 import { useRecoilValue } from 'recoil';
-import { ActionTypes, Sides } from '#constants';
-import { actionState, playersState } from '#recoil/selectors';
+import { actionState } from '#recoil/selectors';
+import useActionMessage from './useActionMessage';
 
 const ActionSnack = () => {
-  const { id, playerName, type } = useRecoilValue(actionState);
+  const { id } = useRecoilValue(actionState);
 
-  const players = useRecoilValue(playersState);
-  const player = players.find(playerToSearch => playerToSearch.name === playerName);
-  
   const [actionUpdated, setActionUpdated] = useState(false);
   const prevAction = useRef(id);
 
@@ -21,15 +18,7 @@ const ActionSnack = () => {
     prevAction.current = id;
   }, [id]);
 
-  let actionMessage;
-
-  switch (type) {
-    case ActionTypes.ADD_PLAYER:
-      actionMessage = (<><span style={{ color: player.side === Sides.RED ? 'red' : 'blue' }}>{playerName}</span> has joined</>);
-      break;
-    default:
-      actionMessage = type;
-  }
+  const actionMessage = useActionMessage();
 
   const handleClose = () => setActionUpdated(false);
 

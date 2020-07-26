@@ -3,25 +3,29 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import { useRecoilValue } from 'recoil';
 import { usePromotePlayer } from '#graphql/mutations/promotePlayer';
-import nameState from '#recoil/atoms/name';
+import { nameState } from '#recoil/atoms';
+import { gameState, playerState } from '#recoil/selectors';
+import { Sides } from '#constants';
 
-const MasterSwitch = ({ masterRed, masterBlue, team }) => {
-  const name = useRecoilValue(nameState);  
+const MasterSwitch = () => {
+  const name = useRecoilValue(nameState);
+  const { masterRed, masterBlue } = useRecoilValue(gameState);
+  const { side } = useRecoilValue(playerState);
   const [promotePlayer] = usePromotePlayer();
 
-    const teamHasMaster = (
-        (team === 'RED' && masterRed)
-        || (team === 'BLUE' && masterBlue)
-    );
+  const teamHasMaster = (
+    (side === Sides.RED && masterRed)
+    || (side === Sides.BLUE && masterBlue)
+  );
 
     return (
-        <FormControlLabel
+      <FormControlLabel
         control={
           <Switch
             name="masterSwitch"
             checked={masterRed === name || masterBlue === name}
             onChange={promotePlayer}
-            color={team === 'BLUE' ? 'primary' : 'secondary'}
+            color={side === Sides.BLUE ? 'primary' : 'secondary'}
             disabled={teamHasMaster}
           />
         }

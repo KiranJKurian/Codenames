@@ -21,3 +21,5 @@ export const ActionTypes = Object.freeze({
   SWITCH_TEAM: 'SWITCH_TEAM',
   END_TURN: 'END_TURN',
 });
+
+export const PlayerSides = [Sides.RED, Sides.BLUE];

@@ -1,50 +1,39 @@
 import React from 'react';
-import { Grid, useTheme } from '@material-ui/core';
+import { Grid } from '@material-ui/core';
 import { useRecoilValue } from 'recoil';
-import nameState from '#recoil/atoms/name';
-import { usePickTile } from '#graphql/mutations/pickTile';
-import { useRoom } from '#graphql/queries/getRoom';
+import styled from 'styled-components';
+import Board from '#components/Board';
 import TeamSwitch from '#components/TeamSwitch';
 import MasterSwitch from '#components/MasterSwitch';
 import EndTurnFab from '#components/EndTurnFab';
 import ActionSnack from '#components/ActionSnack';
-import Board from '../Board';
+import { playerState, gameState } from '#recoil/selectors';
+import { Sides } from '#constants';
+import teamColor from '#styles/teamColor';
+
+const Container = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const ContainerHiddenWhenNoSide = styled(Container)`
+  opacity: ${props => props.side ? 1 : 0};
+`;
+
+const TeamHeading = styled.h4`
+  ${teamColor}
+`;
 
 const GameBoard = () => {
-  const name = useRecoilValue(nameState);
-
-  const room = useRoom();
-
-  const [pickTile] = usePickTile();
-
   const {
-    palette: {
-      primary: {
-        main: primary,
-        dark: primaryDark,
-      },
-      secondary: {
-        main: secondary,
-        dark: secondaryDark,
-      },
-    },
-  } = useTheme();
+    turn,
+    remainingRed = -1,
+    remainingBlue = -1,
+  } = useRecoilValue(gameState);
 
-  const {
-    players = [],
-    currentGame: {
-      turn,
-      winner,
-      board: tiles = [],
-      remainingRed = -1,
-      masterRed,
-      remainingBlue = -1,
-      masterBlue,
-    } = {},
-  } = room || {};
+  const { side } = useRecoilValue(playerState);
 
-  const player = players.find(({ name: playerName }) => playerName === name) || {};
-
+  // TODO: Add Error and Loading states
   // if (errorTiles) {
   //   console.error(errorTiles);
   //   return <div>Oops, looks like we got an error. Please try again later</div>;
@@ -54,46 +43,28 @@ const GameBoard = () => {
   //   return <div>Loading...</div>;
   // }
 
-  const handleTileClick = word => () => {
-    pickTile(word);
-  };
-
   return (
     <Grid container spacing={4}>
       <Grid item xs={12}>
         <Grid container direction="column" spacing={2}>
           <Grid item xs={12}>
-            <div style={{display: 'flex', justifyContent: 'space-between', opacity: player.side ? 1 : 0}}>
-              <TeamSwitch 
-                disabled={masterRed === name || masterBlue === name}
-                team={player.side}
-              />
-              <MasterSwitch
-                masterRed={masterRed}
-                masterBlue={masterBlue}
-                team={player.side}
-              />
-            </div>
-            <div style={{display: 'flex', justifyContent: 'space-between'}}>
-              <h4 style={{ color: turn === 'BLUE' ? primary : primaryDark }}>
+            <ContainerHiddenWhenNoSide side={side}>
+              <TeamSwitch />
+              <MasterSwitch />
+            </ContainerHiddenWhenNoSide>
+            <Container>
+              <TeamHeading side={Sides.BLUE} dark={turn !== Sides.BLUE}>
                 Blue: {remainingBlue} Left
-              </h4>
-              <h4 style={{ color: turn === 'RED' ? secondary : secondaryDark }}>
+              </TeamHeading>
+              <TeamHeading side={Sides.RED} dark={turn !== Sides.RED}>
                 Red: {remainingRed} Left
-              </h4>
-            </div>
-            <Board
-              onTileClick={handleTileClick}
-              codenames={tiles}
-            />
+              </TeamHeading>
+            </Container>
+            <Board />
           </Grid>
         </Grid>
       </Grid>
-      {turn === player.side && (
-        <EndTurnFab
-          side={player.side}
-        />
-      )}
+      <EndTurnFab />
       <ActionSnack />
     </Grid>
   );

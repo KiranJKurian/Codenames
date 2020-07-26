@@ -12,7 +12,7 @@ import { useHistory } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import Logo from '#sc/Logo';
 import LogoAndNameWrapper from '#sc/LogoAndNameWrapper';
-import nameState from '#recoil/atoms/name';
+import { nameState } from '#recoil/atoms';
 import logo from '../../logo.svg';
 
 const AppBarWithLogout = () => {

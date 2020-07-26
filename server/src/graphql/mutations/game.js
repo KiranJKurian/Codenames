@@ -55,7 +55,13 @@ export const endTurn = async (name, roomCode) => {
         currentGame.turn = currentGame.turn === Sides.RED ? Sides.BLUE : Sides.RED;
         return room
           .save()
-          .then(() => room.addAction({ type: ActionTypes.END_TURN, playerName: name }))
+          .then(() =>
+            room.addAction({
+              type: ActionTypes.END_TURN,
+              playerName: name,
+              playerSide: playerEndingTurn.side,
+            })
+          )
           .then(() => currentGame);
       })
       .catch(e => {

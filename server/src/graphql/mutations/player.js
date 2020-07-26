@@ -14,7 +14,11 @@ export const addPlayer = async (name, side = null, roomCode) => {
         ])
       )
       .then(([room, player]) => {
-        room.addAction({ type: ActionTypes.ADD_PLAYER, playerName: player.name });
+        room.addAction({
+          type: ActionTypes.ADD_PLAYER,
+          playerName: player.name,
+          playerSide: player.side,
+        });
         return player;
       })
       .catch(e => {
@@ -59,7 +63,13 @@ export const demotePlayer = async (name, roomCode) => {
         }
         return room
           .save()
-          .then(() => room.addAction({ type: ActionTypes.DEMOTE_PLAYER, playerName: name }))
+          .then(() =>
+            room.addAction({
+              type: ActionTypes.DEMOTE_PLAYER,
+              playerName: name,
+              playerSide: playerToDemote.side,
+            })
+          )
           .then(() => currentGame);
       })
       .catch(e => {
@@ -115,7 +125,13 @@ export const promotePlayer = async (name, roomCode) => {
 
         return room
           .save()
-          .then(() => room.addAction({ type: ActionTypes.PROMOTE_PLAYER, playerName: name }))
+          .then(() =>
+            room.addAction({
+              type: ActionTypes.PROMOTE_PLAYER,
+              playerName: name,
+              playerSide: playerToPromote.side,
+            })
+          )
           .then(() => currentGame);
       })
       .catch(() => null);
@@ -157,7 +173,13 @@ export const switchTeam = async (name, roomCode) => {
         playerToSwitch.side = playerToSwitch.side === Sides.RED ? Sides.BLUE : Sides.RED;
         return room
           .save()
-          .then(() => room.addAction({ type: ActionTypes.SWITCH_TEAM, playerName: name }))
+          .then(() =>
+            room.addAction({
+              type: ActionTypes.SWITCH_TEAM,
+              playerName: name,
+              playerSide: playerToSwitch.side,
+            })
+          )
           .then(() => playerToSwitch);
       })
       .catch(() => null);
@@ -192,7 +214,13 @@ export const removePlayer = async (name, roomCode) => {
           { useFindAndModify: false, new: true }
         )
       )
-      .then(room => room.addAction({ type: ActionTypes.REMOVE_PLAYER, playerName: name }))
+      .then(room =>
+        room.addAction({
+          type: ActionTypes.REMOVE_PLAYER,
+          playerName: name,
+          playerSide: player.side,
+        })
+      )
       .catch(e => {
         console.error(e);
         return null;
