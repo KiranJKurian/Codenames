@@ -1,9 +1,8 @@
-import { ActionTypes } from '../../constants';
+import mongoose from 'mongoose';
 
-const mongoose = require('mongoose');
-const { TileSchema } = require('./Tile');
-const { generateTiles } = require('../../tiles');
-const { defaultNumWords, Sides } = require('../../constants');
+import { TileSchema } from './Tile';
+import { generateTiles } from '../../tiles';
+import { ActionTypes, defaultNumWords, Sides } from '../../constants';
 
 export const GameSchema = new mongoose.Schema({
   turn: {

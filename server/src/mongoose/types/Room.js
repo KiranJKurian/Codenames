@@ -7,7 +7,7 @@ import uniqueId from '../../utils/uniqueId';
 
 const modelName = 'Room';
 
-const RoomSchema = new mongoose.Schema({
+export const RoomSchema = new mongoose.Schema({
   roomCode: {
     type: String,
     required: true,
@@ -32,9 +32,9 @@ const RoomSchema = new mongoose.Schema({
 // Initializes RoomSchemas instance methods
 initializeMethods(RoomSchema);
 
-const Room = mongoose.model(modelName, RoomSchema);
+export const Room = mongoose.model(modelName, RoomSchema);
 
-const createRoom = () => {
+export const createRoom = () => {
   const roomCode = uniqueId();
   // insert room document, overwrite existing to prevent roomCode collision
   return Room.findOneAndUpdate(
@@ -46,11 +46,4 @@ const createRoom = () => {
   );
 };
 
-const findRoom = roomCode => Room.findOne({ roomCode });
-
-module.exports = {
-  Room,
-  RoomSchema,
-  createRoom,
-  findRoom,
-};
+export const findRoom = roomCode => Room.findOne({ roomCode });

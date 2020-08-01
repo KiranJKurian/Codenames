@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const { PlayerSides, ActionTypes } = require('../../constants');
+import mongoose from 'mongoose';
+import { PlayerSides, ActionTypes } from '../../constants';
 
 export const PlayerSchema = new mongoose.Schema({
   name: {

@@ -1,7 +1,5 @@
-import { ActionTypes } from '../../constants';
-
-const mongoose = require('mongoose');
-const { Sides } = require('../../constants');
+import mongoose from 'mongoose';
+import { ActionTypes, Sides } from '../../constants';
 
 export const TileSchema = new mongoose.Schema({
   word: {
