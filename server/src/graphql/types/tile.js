@@ -22,23 +22,39 @@ export const typeDef = `
 
 export const resolvers = {
   Mutation: {
-    pickTile: async (_, { name, word, roomCode }) => pickTile(name, word, roomCode),
+    pickTile: async (_, { name, word, roomCode }, { Room }) => pickTile(name, word, roomCode, Room),
   },
   Tile: {
     id: ({ _id: id }) => id,
-    side: ({ side, picked }, _, { player, currentGame = {} }) => {
+    side: async ({ side, picked }, _, { Room, variables: { name, roomCode } = {} }) => {
       if (picked) {
         return side;
       }
 
-      if (
-        currentGame.winner ||
-        (player &&
-          (player.name === currentGame.masterRed || player.name === currentGame.masterBlue))
-      ) {
-        return side;
+      try {
+        return await Room.findOne(
+          { roomCode },
+          { games: { $slice: -1 }, players: { $elemMatch: { name } } }
+        )
+          .then(room => {
+            const {
+              players: [player],
+              games: [currentGame],
+            } = room;
+
+            if (
+              currentGame.winner ||
+              (player &&
+                (player.name === currentGame.masterRed || player.name === currentGame.masterBlue))
+            ) {
+              return side;
+            }
+            return null;
+          })
+          .catch(() => null);
+      } catch (e) {
+        return null;
       }
-      return null;
     },
   },
 };

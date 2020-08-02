@@ -1,10 +1,9 @@
 import { ActionTypes } from '../../constants';
 
-const { Room } = require('../../mongoose/types/Room');
 const { Sides } = require('../../constants');
 
 // eslint-disable-next-line import/prefer-default-export
-export const pickTile = async (name, word, roomCode) => {
+export const pickTile = async (name, word, roomCode, Room) => {
   try {
     let playerPicked = null;
     const tile = await Room.findOne(
@@ -28,7 +27,7 @@ export const pickTile = async (name, word, roomCode) => {
           !matchedTile ||
           matchedTile.picked
         ) {
-          throw new Error();
+          throw new Error(`Could not pick tile ${word} of room ${roomCode}`);
         }
 
         if (matchedTile.side === Sides.RED) {

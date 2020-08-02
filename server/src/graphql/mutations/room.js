@@ -1,12 +1,10 @@
 import { createGame } from './game';
 
-const { createRoom } = require('../../mongoose/types/Room');
-
-const createRoomMutation = async () => {
+const createRoomMutation = async Room => {
   try {
-    const room = createRoom()
+    const room = Room.createRoom()
       .then(newRoom => {
-        createGame(newRoom.roomCode);
+        createGame(newRoom.roomCode, Room);
         return newRoom;
       })
       .catch(() => null);

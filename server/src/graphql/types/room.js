@@ -1,5 +1,4 @@
 import { createRoom } from '../mutations/room';
-import { Room } from '../../mongoose/types/Room';
 
 export const typeDef = `
   extend type Query {
@@ -30,10 +29,10 @@ export const typeDef = `
 
 export const resolvers = {
   Query: {
-    room: async (_, { roomCode }) => Room.findOne({ roomCode }),
+    room: async (_, { roomCode }, { Room }) => Room.findOne({ roomCode }),
   },
   Mutation: {
-    createRoom: async () => createRoom(),
+    createRoom: async (_, __, { Room }) => createRoom(Room),
   },
   Room: {
     id: ({ _id: id }) => id,

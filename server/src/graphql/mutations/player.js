@@ -1,9 +1,8 @@
 import { ActionTypes } from '../../constants';
 
-const { Room } = require('../../mongoose/types/Room');
 const { Sides } = require('../../constants');
 
-export const addPlayer = async (name, side = null, roomCode) => {
+export const addPlayer = async (name, side = null, roomCode, Room) => {
   try {
     // If extra logic is needed reimplement Room.methods.addPlayer
     const addedPlayer = Room.findOne({ roomCode })
@@ -45,7 +44,7 @@ export const addPlayer = async (name, side = null, roomCode) => {
   }
 };
 
-export const demotePlayer = async (name, roomCode) => {
+export const demotePlayer = async (name, roomCode, Room) => {
   try {
     const game = await Room.findOne(
       { roomCode },
@@ -96,7 +95,7 @@ export const demotePlayer = async (name, roomCode) => {
   }
 };
 
-export const promotePlayer = async (name, roomCode) => {
+export const promotePlayer = async (name, roomCode, Room) => {
   try {
     const game = await Room.findOne(
       { roomCode },
@@ -155,7 +154,7 @@ export const promotePlayer = async (name, roomCode) => {
   }
 };
 
-export const switchTeam = async (name, roomCode) => {
+export const switchTeam = async (name, roomCode, Room) => {
   try {
     const player = await Room.findOne(
       { roomCode },
@@ -203,7 +202,7 @@ export const switchTeam = async (name, roomCode) => {
   }
 };
 
-export const removePlayer = async (name, roomCode) => {
+export const removePlayer = async (name, roomCode, Room) => {
   try {
     // TODO: Investigate optional action creations for removes/demotes/etc when no action is preformed
     const player = await demotePlayer(name, roomCode)

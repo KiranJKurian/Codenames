@@ -5,8 +5,6 @@ import { ActionSchema } from './Action';
 import { initializeMethods } from '../methods/room';
 import uniqueId from '../../utils/uniqueId';
 
-const modelName = 'Room';
-
 export const RoomSchema = new mongoose.Schema({
   roomCode: {
     type: String,
@@ -32,12 +30,10 @@ export const RoomSchema = new mongoose.Schema({
 // Initializes RoomSchemas instance methods
 initializeMethods(RoomSchema);
 
-export const Room = mongoose.model(modelName, RoomSchema);
-
-export const createRoom = () => {
+RoomSchema.statics.createRoom = function createRoom() {
   const roomCode = uniqueId();
   // insert room document, overwrite existing to prevent roomCode collision
-  return Room.findOneAndUpdate(
+  return this.findOneAndUpdate(
     // query
     { roomCode },
     // new document
@@ -45,5 +41,3 @@ export const createRoom = () => {
     { new: true, overwrite: true, upsert: true, useFindAndModify: false }
   );
 };
-
-export const findRoom = roomCode => Room.findOne({ roomCode });

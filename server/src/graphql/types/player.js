@@ -44,15 +44,16 @@ export const typeDef = `
 
 export const resolvers = {
   Mutation: {
-    addPlayer: async (_, { name, side = null, roomCode }) => addPlayer(name, side, roomCode),
+    addPlayer: async (_, { name, side = null, roomCode }, { Room }) =>
+      addPlayer(name, side, roomCode, Room),
 
-    demotePlayer: async (_, { name, roomCode }) => demotePlayer(name, roomCode),
+    demotePlayer: async (_, { name, roomCode }, { Room }) => demotePlayer(name, roomCode, Room),
 
-    promotePlayer: async (_, { name, roomCode }) => promotePlayer(name, roomCode),
+    promotePlayer: async (_, { name, roomCode }, { Room }) => promotePlayer(name, roomCode, Room),
 
-    switchTeam: async (_, { name, roomCode }) => switchTeam(name, roomCode),
+    switchTeam: async (_, { name, roomCode }, { Room }) => switchTeam(name, roomCode, Room),
 
-    removePlayer: async (_, { name, roomCode }) => removePlayer(name, roomCode),
+    removePlayer: async (_, { name, roomCode }, { Room }) => removePlayer(name, roomCode, Room),
   },
   Player: {
     id: ({ _id: id }) => id,

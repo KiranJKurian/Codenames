@@ -1,9 +1,8 @@
 import { ActionTypes } from '../../constants';
 
-const { Room } = require('../../mongoose/types/Room');
 const { Sides } = require('../../constants');
 
-export const createGame = async roomCode => {
+export const createGame = async (roomCode, Room) => {
   try {
     const game = Room.findOne({ roomCode })
       .then(room => room.createGame())
@@ -37,7 +36,7 @@ export const createGame = async roomCode => {
   }
 };
 
-export const endTurn = async (name, roomCode) => {
+export const endTurn = async (name, roomCode, Room) => {
   try {
     const game = await Room.findOne(
       { roomCode },

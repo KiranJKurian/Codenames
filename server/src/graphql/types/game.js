@@ -27,8 +27,8 @@ export const typeDef = `
 
 export const resolvers = {
   Mutation: {
-    createGame: async (_, { roomCode }) => createGame(roomCode),
-    endTurn: async (_, { name, roomCode }) => endTurn(name, roomCode),
+    createGame: async (_, { roomCode }, { Room }) => createGame(roomCode, Room),
+    endTurn: async (_, { name, roomCode }, { Room }) => endTurn(name, roomCode, Room),
   },
   Game: {
     id: ({ _id: id }) => id,
