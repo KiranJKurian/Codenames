@@ -19,13 +19,44 @@ import { RoomSchema } from './mongoose/types/Room';
 
 config();
 
-(async () => {
-  await mongoose.connect(process.env.MONGO_DB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+let cachedDb = null;
+const cachedModels = {};
+
+const connectToDatabase = () => {
+  console.log('=> connect to database');
+
+  if (cachedDb) {
+    console.log('=> using cached database instance');
+    return Promise.resolve(cachedDb);
+  }
+
+  return mongoose
+    .connect(process.env.MONGO_DB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    })
+    .then(db => {
+      cachedDb = db;
+      return cachedDb;
+    });
+};
+
+const getMongooseModel = (schemaName, schema) => {
+  return connectToDatabase().then(() => {
+    if (!cachedModels[schemaName]) {
+      console.log(`=> caching model: ${schemaName}`);
+      cachedModels[schemaName] = mongoose.model(schemaName, schema);
+    } else {
+      console.log(`=> using cached model: ${schemaName}`);
+    }
+
+    return cachedModels[schemaName];
   });
-  // we're connected!
-  console.log('Connected to MongoDB');
+};
+
+(async () => {
+  const RoomModel = await getMongooseModel('Room', RoomSchema);
+  console.log('Connected to MongoDB. Fetched Room Model');
 
   const server = new ApolloServer({
     typeDefs: [
@@ -51,7 +82,7 @@ config();
     ),
     context: ({ req: { body: { variables } = {} } = {} }) => ({
       variables,
-      Room: mongoose.model('Room', RoomSchema),
+      Room: RoomModel,
     }),
   });
 
