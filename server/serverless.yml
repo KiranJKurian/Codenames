@@ -1,0 +1,37 @@
+service: codenames
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+    # If you use Yarn instead of NPM in your environment, uncomment the following line.
+    # packager: yarn
+  serverless-offline:
+    httpPort: 4000
+    noPrependStageInUrl: true
+
+package:
+  individually: true
+
+functions:
+  graphql:
+    # this is formatted as <FILENAME>.<HANDLER>
+    handler: graphql.graphqlHandler
+    events:
+    - http:
+        path: graphql
+        method: post
+        cors: true
+    - http:
+        path: graphql
+        method: get
+        cors: true
+
+plugins:
+  - serverless-offline
+  - serverless-webpack
+  - serverless-dotenv-plugin

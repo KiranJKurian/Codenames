@@ -1,5 +1,7 @@
 // GraphQL endpoint
-export const GRAPHQL_URI = 'http://localhost:4000/graphql';
+// TODO: Check if env is prod
+const production = true;
+export const GRAPHQL_URI = production ? 'https://rmejnyteyj.execute-api.us-east-1.amazonaws.com/dev/graphql' : 'http://localhost:4000/graphql';
 
 export const Sides = Object.freeze({
   RED: 'RED',

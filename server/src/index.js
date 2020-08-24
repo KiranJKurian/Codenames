@@ -1,7 +1,6 @@
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer } from 'apollo-server-lambda';
 import { merge } from 'lodash';
 import mongoose from 'mongoose';
-import { config } from 'dotenv';
 import Side from './graphql/types/side';
 import ActionType from './graphql/types/actionType';
 import Query from './graphql/types/query';
@@ -17,76 +16,34 @@ import { typeDef as Tile, resolvers as tileResolvers } from './graphql/types/til
 import { typeDef as Action, resolvers as actionResolvers } from './graphql/types/action';
 import { RoomSchema } from './mongoose/types/Room';
 
-config();
+const { MONGO_DB_URI } = process.env;
 
-let cachedDb = null;
-const cachedModels = {};
+mongoose
+  .connect(MONGO_DB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('Connected to MonogoDB'))
+  .catch(e => console.error('Could not connect to MongoDB', e));
 
-const connectToDatabase = () => {
-  console.log('=> connect to database');
+const RoomModel = mongoose.model('Room', RoomSchema);
+console.log('Fetched Room Model');
 
-  if (cachedDb) {
-    console.log('=> using cached database instance');
-    return Promise.resolve(cachedDb);
-  }
-
-  return mongoose
-    .connect(process.env.MONGO_DB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
-    .then(db => {
-      cachedDb = db;
-      return cachedDb;
-    });
-};
-
-const getMongooseModel = (schemaName, schema) => {
-  return connectToDatabase().then(() => {
-    if (!cachedModels[schemaName]) {
-      console.log(`=> caching model: ${schemaName}`);
-      cachedModels[schemaName] = mongoose.model(schemaName, schema);
-    } else {
-      console.log(`=> using cached model: ${schemaName}`);
-    }
-
-    return cachedModels[schemaName];
-  });
-};
-
-(async () => {
-  const RoomModel = await getMongooseModel('Room', RoomSchema);
-  console.log('Connected to MongoDB. Fetched Room Model');
-
-  const server = new ApolloServer({
-    typeDefs: [
-      Query,
-      Mutation,
-      MutationResponse,
-      Side,
-      ActionType,
-      Room,
-      Game,
-      Tile,
-      Player,
-      Action,
-    ],
-    resolvers: merge(
-      {},
-      mutationResponseResolvers,
-      roomResolvers,
-      gameResolvers,
-      playerResolvers,
-      tileResolvers,
-      actionResolvers
-    ),
-    context: ({ req: { body: { variables } = {} } = {} }) => ({
-      variables,
-      Room: RoomModel,
-    }),
-  });
-
-  server.listen(4000).then(({ url }) => {
-    console.log(`🚀 Server ready at ${url}`);
-  });
-})();
+export const server = new ApolloServer({
+  typeDefs: [Query, Mutation, MutationResponse, Side, ActionType, Room, Game, Tile, Player, Action],
+  resolvers: merge(
+    {},
+    mutationResponseResolvers,
+    roomResolvers,
+    gameResolvers,
+    playerResolvers,
+    tileResolvers,
+    actionResolvers
+  ),
+  context: ({ event: { body } = {} }) => ({
+    variables: (JSON.parse(body) || {}).variables,
+    Room: RoomModel,
+  }),
+  playground: true,
+  introspection: true,
+});

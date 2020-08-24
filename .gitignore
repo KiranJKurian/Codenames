@@ -62,3 +62,7 @@ typings/
 
 # secrets
 **/mongodb-string.json
+
+# serverless code
+.serverless
+.webpack

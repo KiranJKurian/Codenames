@@ -31,7 +31,8 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
-    "lint": "NODE_ENV=development BABEL_ENV=development eslint src"
+    "lint": "NODE_ENV=development BABEL_ENV=development eslint src",
+    "deploy": "aws s3 sync build/ s3://codenames-app --acl public-read"
   },
   "browserslist": {
     "production": [
