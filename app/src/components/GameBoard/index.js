@@ -10,10 +10,18 @@ import ActionSnack from '#components/ActionSnack';
 import { playerState, gameState } from '#recoil/selectors';
 import { Sides } from '#constants';
 import teamColor from '#styles/teamColor';
+import PlayerAvatarContainer from '#components/PlayerAvatarContainer';
 
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
+`;
+
+const TeamContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  text-align: ${props => props.side === Sides.BLUE ? 'start' : 'end'};
 `;
 
 const ContainerHiddenWhenNoSide = styled(Container)`
@@ -29,6 +37,8 @@ const GameBoard = () => {
     turn,
     remainingRed = -1,
     remainingBlue = -1,
+    masterBlue,
+    masterRed,
   } = useRecoilValue(gameState);
 
   const { side } = useRecoilValue(playerState);
@@ -53,12 +63,22 @@ const GameBoard = () => {
               <MasterSwitch />
             </ContainerHiddenWhenNoSide>
             <Container>
-              <TeamHeading side={Sides.BLUE} dark={turn !== Sides.BLUE}>
-                Blue: {remainingBlue} Left
-              </TeamHeading>
-              <TeamHeading side={Sides.RED} dark={turn !== Sides.RED}>
-                Red: {remainingRed} Left
-              </TeamHeading>
+              <TeamContainer side={Sides.BLUE}>
+                <TeamHeading side={Sides.BLUE} dark={turn !== Sides.BLUE}>
+                  Spymaster: {masterBlue || 'None'}
+                  <br />
+                  {remainingBlue} Left
+                </TeamHeading>
+                <PlayerAvatarContainer side={Sides.BLUE} />
+              </TeamContainer>
+              <TeamContainer side={Sides.RED}>
+                <TeamHeading side={Sides.RED} dark={turn !== Sides.RED}>
+                  Spymaster: {masterRed || 'None'}
+                  <br />
+                  {remainingRed} Left
+                </TeamHeading>
+                <PlayerAvatarContainer side={Sides.RED} />
+              </TeamContainer>
             </Container>
             <Board />
           </Grid>
