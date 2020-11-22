@@ -15,6 +15,7 @@ const sideColor = {
   BLUE: 'primary',
   RED: 'secondary',
   YELLOW: undefined,
+  BLACK: undefined,
 };
 
 const Board = () => {

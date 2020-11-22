@@ -9,7 +9,8 @@ const generateSides = (numSides = defaultNumWords) => {
 
   sides.fill(Sides.BLUE, 0, blues);
   sides.fill(Sides.RED, blues, blues + reds);
-  sides.fill(Sides.YELLOW, blues + reds);
+  sides.fill(Sides.YELLOW, blues + reds, numSides - 1);
+  sides.fill(Sides.BLACK, numSides - 1);
 
   return shuffle(sides);
 };

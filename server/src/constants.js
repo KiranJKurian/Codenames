@@ -9,6 +9,7 @@ export const Sides = Object.freeze({
   RED: 'RED',
   BLUE: 'BLUE',
   YELLOW: 'YELLOW',
+  BLACK: 'BLACK',
 });
 
 export const ActionTypes = Object.freeze({

@@ -40,6 +40,16 @@ export const pickTile = async (name, word, roomCode, Room) => {
           if (game.remainingBlue === 0) {
             game.winner = Sides.BLUE;
           }
+        } else if (matchedTile.side === Sides.BLACK) {
+          if (playerToValidate.side === Sides.BLUE) {
+            game.winner = Sides.RED;
+          } else if (playerToValidate.side === Sides.RED) {
+            game.winner = Sides.BLUE;
+          } else {
+            throw new Error(
+              `Could not pick tile ${word} of room ${roomCode}. Black tile picked but could not determine side of player ${name}`
+            );
+          }
         }
 
         if (turn === Sides.RED && matchedTile.side !== Sides.RED) {
