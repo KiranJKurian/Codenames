@@ -1,9 +1,11 @@
 import React from 'react';
-import { Paper, Grid, Button } from '@material-ui/core';
+import { Paper, Grid, Button, Tooltip } from '@material-ui/core';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
+import { Block } from '@material-ui/icons';
 import { usePickTile } from '#graphql/mutations/pickTile';
 import { gameState } from '#recoil/selectors';
+import { Sides } from '#constants';
 
 const StyledButton = styled(Button)`
   height: 100%;
@@ -34,6 +36,11 @@ const Board = () => {
             <StyledButton
               variant={picked ? 'contained' : 'outlined'}
               color={sideColor[side]}
+              startIcon={side === Sides.BLACK && (
+                <Tooltip enterTouchDelay={50} title="This is the bomb. Activating this will cause the players team to automatically lose" aria-label="bomb">
+                  <Block />
+                </Tooltip>
+              )}
               onClick={handleTileClick(word)}
             >
               {word}
