@@ -15,7 +15,7 @@
     "apollo-server-lambda": "^2.16.1",
     "dotenv": "^8.2.0",
     "graphql": "^14.7.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "mongoose": "^5.9.10"
   },
   "devDependencies": {
